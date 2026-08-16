@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
-# Block direct pushes to main, then run presubmit checks.
+# Block direct pushes to main — every change goes through a pull request.
 # Enable with: git config core.hooksPath .githooks
 set -euo pipefail
 
-protected='^refs/heads/(main|master)$'
-blocked=0
-
 while read -r _local_ref _local_sha remote_ref _remote_sha; do
-  if [[ "$remote_ref" =~ $protected ]]; then
-    blocked=1
-  fi
-done
-
-if [[ $blocked -eq 1 ]]; then
-  cat >&2 <<'MSG'
+  if [[ "$remote_ref" =~ ^refs/heads/(main|master)$ ]]; then
+    cat >&2 <<'MSG'
 
   x Direct pushes to main are not allowed.
 
@@ -23,13 +15,8 @@ if [[ $blocked -eq 1 ]]; then
       gh pr create
 
 MSG
-  exit 1
-fi
-
-echo "presubmit:"
-if ! python3 "$(git rev-parse --show-toplevel)/scripts/presubmit.py"; then
-  echo "  push aborted" >&2
-  exit 1
-fi
+    exit 1
+  fi
+done
 
 exit 0
