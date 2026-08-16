@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Block direct pushes to main — every change goes through a PR.
+# Block direct pushes to main, then run presubmit checks.
 # Enable with: git config core.hooksPath .githooks
 set -euo pipefail
 
@@ -26,12 +26,10 @@ MSG
   exit 1
 fi
 
-if [[ -d host/tests ]]; then
-  echo "  -> running tests"
-  if ! python3 -m unittest discover -s host/tests -p 'test_*.py' -q; then
-    echo "  x tests failed, push aborted" >&2
-    exit 1
-  fi
+echo "presubmit:"
+if ! python3 "$(git rev-parse --show-toplevel)/scripts/presubmit.py"; then
+  echo "  push aborted" >&2
+  exit 1
 fi
 
 exit 0
