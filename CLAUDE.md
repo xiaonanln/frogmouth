@@ -9,7 +9,9 @@ A garden sentry that looks before it acts: camera identifies a small animal → 
 turns → aimed jet of water. Targets are **small animals generally** — possums, brush
 turkeys, cats, birds, rabbits — not possums specifically.
 
-Design notes live in `~/projects/ideas/coding/frogmouth.md`. Change the design there first.
+**The design lives in this repository and nowhere else.** `docs/v0-design.md` holds the
+V0 design, `SAFETY.md` the safety rules. Change the design there first, in a PR. Never
+point this repository at a file outside it — anyone cloning it must get the whole thing.
 
 ## The thesis, which is easy to lose
 
