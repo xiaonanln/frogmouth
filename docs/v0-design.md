@@ -101,6 +101,25 @@ The camera is fixed, so **its field of view is the entire sensed area**. Therefo
 | Sweep **>** FOV | Angles that can never produce a detection — **phantom coverage** |
 | Sweep **<** FOV | Targets visible at the frame edges **cannot be reached** |
 
+The RLC-520A is 80° horizontal, so the sweep is fixed: **±40° about the centre line.**
+
+80° is a datasheet figure, and the next section is about why those are not trusted. Size
+the *mechanics* with it — bracket travel, hose slack, where the servo's centre has to sit
+— and nothing else. Two separate limits come out of the build, and conflating them is a
+safety bug:
+
+| Limit | Lives in | Comes from |
+|---|---|---|
+| **Mechanical** | firmware | the physical stops — measured bracket travel and hose slack |
+| **Reachable image** | host | `centre ± hfov/2`, from calibration |
+
+The firmware clamp is a property of the rig, not of the camera, so calibration must never
+feed it. A crooked mount can calibrate to `centre = 10°, hfov = 80°` — reachable −30°..50°,
+which on one side is past where the bracket lets the servo go. Deriving the firmware limit
+from that would let a host aiming at something genuinely in frame drive the servo into its
+own stop. The firmware clamps to the stops, the host declines to aim outside the frame,
+and neither number is computed from the other.
+
 Pixel offset is proportional to `tan θ`, so:
 
 ```
@@ -147,7 +166,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 
 | Part | Model | Price (AUD) |
 |---|---|---|
-| **Camera** | Reolink RLC-520A PoE 5MP | **$99.99** |
+| **Camera** | Reolink RLC-520A PoE 5MP — 80° H FOV, 850 nm IR to 30 m | **$99.99** |
 | PoE injector | any | ~$25 |
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
@@ -175,7 +194,7 @@ The lazy susan bearing takes the load; the servo drives through a horn or linkag
 
 Water path: fixed hose → **short flexible hose** → rotating head. A stiff garden hose
 will twist the servo back. A proper water rotary union costs $50–200 — skip it for V0; a
-flexible tail is fine over ±60°.
+flexible tail is fine over ±60°, comfortably more than the ±40° the camera's FOV asks for.
 
 ### Four mistakes that cost a rebuild
 
@@ -200,9 +219,13 @@ Solar and battery cameras sleep to save power and only wake on their own PIR. Th
 no continuous stream — which puts the PIR back in charge of what gets seen, and the PIR
 is the thing this project exists to replace. **Wired power and continuous RTSP.**
 
-850 nm IR (faint visible red glow) vs 940 nm (invisible, 30–50% less sensitive, pricier):
-**start with 850 nm.** Whether the glow deters the animals is an empirical question you
-can answer in the first week. Don't pay double for a problem you haven't observed.
+The RLC-520A settles the IR question by having it built in: **850 nm, 30 m range.** The
+alternative, 940 nm, is invisible to the eye but 30–50% less sensitive and dearer, and it
+would mean a separate illuminator.
+
+850 nm glows faintly red. Whether that glow itself deters the animals is an empirical
+question the first week of recording answers — and if it does, that is the point to add a
+940 nm illuminator, not before. Don't pay double for a problem you haven't observed.
 
 ---
 
