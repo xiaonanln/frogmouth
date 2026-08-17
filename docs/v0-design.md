@@ -472,11 +472,19 @@ The servo then drives the sprinkler body, which has far more to grip than the sw
 the heavy base and riser stay still underneath — weight on the side that does not move.
 
 ```
-C:   sprinkler head (own rotation locked)
-       └ swivel, rotating half   ← servo lever clamps here or just above
-         swivel, fixed half
+C:   sprinkler head (own rotation locked)      inlet down, nozzle out
+       └ swivel, rotating half                 ← servo lever clamps here or just above
+         swivel, fixed half                    axis VERTICAL, so the head sweeps horizontally
            └ riser ─ heavy base (stationary)
 ```
+
+The swivel's axis stands **vertical**, which is what makes the head sweep in the horizontal
+plane. An impact sprinkler head is already *inlet down, nozzle out*, so the ninety degrees the
+water has to turn is built into it — that turn is exactly what B has to add an elbow for.
+
+A vertical axis also means **gravity produces no torque to fight.** A heavy or lopsided head
+loads the bearing sideways but exerts no moment about a vertical axis, so the servo is only
+ever working against seal friction and jet reaction — never against weight.
 
 Its one hard requirement: **lock the head's own rotation.** Leave it free and there are two
 rotary joints in series, the servo commands one, and the resulting angle is undetermined. The
@@ -490,6 +498,10 @@ Whichever wins, four things decide it and none can be answered from here:
 - Can the friction screw be backed off, and does its friction help hold or fight the servo?
 - **Does the head creep once the water is on?** Any nozzle not pointing exactly through the
   axis leaves a reaction torque. This is the one that needs water to answer.
+- **Can the servo still turn it once the water is on?** Line pressure pushes the swivel's two
+  halves apart — around 4 kg at mains pressure through a 10 mm bore — and that force lands on
+  the seal, so friction rises with pressure. Free by hand when dry says nothing about driven
+  under pressure, and testing dry first is the natural mistake.
 
 Residual torque is not zero in any arrangement — line pressure loads the seal and seals have friction
 — so *holds position against torque* stays on the definition of done. It just stops being a
