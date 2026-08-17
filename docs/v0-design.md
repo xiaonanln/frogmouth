@@ -266,29 +266,52 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Flyback diode | 1N4004 or 1N4007, **across the solenoid** | ~$0.50 |
 | Pull-up resistor | 10 kΩ, on the relay input | ~$0.30 |
 | Bench indicator | 12V panel lamp, or an LED with a 1 kΩ series resistor | ~$2 |
-| | | **~$290** |
+| Jumper wires | female-to-female, Pi header to relay board | ~$5 |
+| Hose fittings | 3/4" BSP, tap to valve | ~$15 |
+| Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
+| Thread tape | PTFE, for every BSP joint | ~$2 |
+| | | **~$310** |
+
+Not costed, because it depends on what you build it on: the **base and bracket** that hold
+the bearing, the servo and the camera together. The mechanics section below says what has to
+be true of it; timber and screws are a legitimate answer for V0.
 
 The last three cost almost nothing and are each load-bearing: without the diode the valve's
 switch-off spike goes looking for the microcontroller, without the pull-up the valve opens
 while the Pi boots, and without the indicator there is no way to prove the valve closes
 before committing water to the question.
 
-### Ordering
+### Shopping list, grouped by where you get it
 
-**Core Electronics** (Newcastle, ships same day before 2PM) has the two parts that must be
-exactly right — the valve and the relay — in stock:
+Ordered so that each group can be bought without waiting on the others, and so that the two
+parts that must be *exactly* right arrive first.
 
-- Solenoid valve — [ROB-10456](https://core-electronics.com.au/12v-solenoid-valve-3-4.html)
-- Relay — [CE05114](https://core-electronics.com.au/5v-2-channel-relay-module-10a.html),
-  the 2-channel board, because the 1-channel one is **not** opto-isolated
+**Core Electronics — online, ships same day before 2PM.** The parts with no acceptable
+substitute:
 
-The diode, resistor and indicator are generic and stocked by any electronics shop. Buy the
-diodes in a strip; they are cents each and the first one always ends up somewhere else.
+- [ROB-10456](https://core-electronics.com.au/12v-solenoid-valve-3-4.html) — the valve.
+  12V DC and 3/4" BSP are both non-negotiable; see the four mistakes below
+- [CE05114](https://core-electronics.com.au/5v-2-channel-relay-module-10a.html) — the relay.
+  The 2-channel board specifically, because the cheaper 1-channel one is **not** opto-isolated
+- Servo and horn, if you are consolidating orders
 
-Other Sydney suppliers: Little Bird (Hornsby) · Jaycar (Hornsby) · RC Hobbyland (Castle
-Hill) · Ultimate Hobbies (Parramatta). Local matters here — the bottleneck is getting the
-rig standing, and a fortnight of international shipping on a critical part is a fortnight
-of not measuring anything.
+**Camera — Reolink direct or any reseller.** RLC-520A plus a PoE injector, unless there is
+already a PoE switch. This one is worth ordering first: it has the longest lead time and
+nothing can be aimed until it is up.
+
+**Jaycar (Hornsby) or Little Bird — walk in.** Diode, 10 kΩ resistor, 12V indicator lamp,
+female-to-female jumper wires. Under $10 the lot. Buy the diodes in a strip; they cost cents
+and the first one always ends up somewhere else.
+
+**Bunnings — walk in.** Nozzle, 3/4" BSP hose fittings, a short flexible hose for the tail,
+PTFE thread tape. **Do not buy a solenoid valve here** — the irrigation aisle is 24V AC.
+
+**Already owned:** the Raspberry Pi, the laptop that runs the host, and a network for them to
+find each other on.
+
+Local matters more than price here. The bottleneck is getting the rig standing, and a
+fortnight of international shipping on a critical part is a fortnight of not measuring
+anything. Other Sydney options: RC Hobbyland (Castle Hill) · Ultimate Hobbies (Parramatta).
 
 ### Mechanics
 
