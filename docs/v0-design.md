@@ -308,18 +308,26 @@ already a PoE switch. This one is worth ordering first: it has the longest lead 
 nothing can be aimed until it is up.
 
 **Jaycar (Hornsby) or Little Bird — walk in.** Diode, 10 kΩ resistor, 12V indicator lamp,
-female-to-female jumper wires. Under $10 the lot. Buy the diodes in a strip; they cost cents
+female-to-female jumper wires, and the 12V supply. Buy the diodes in a strip; they cost cents
 and the first one always ends up somewhere else.
 
+**RC Hobbyland (Castle Hill) or Ultimate Hobbies (Parramatta) — walk in.** The 6–7.4V BEC.
+This is RC-hobby stock rather than electronics stock, which is why those shops are on the
+list at all.
+
 **Bunnings — walk in.** Nozzle, 3/4" BSP hose fittings, a short flexible hose for the tail,
-PTFE thread tape. **Do not buy a solenoid valve here** — the irrigation aisle is 24V AC.
+PTFE thread tape, and whatever timber and fasteners the base is made of. **Do not buy a
+solenoid valve here** — the irrigation aisle is 24V AC.
+
+**Online, no hurry.** The lazy susan bearing. Nothing else waits on it, so it is the one item
+where a slow shipment costs nothing.
 
 **Already owned:** the Raspberry Pi, the laptop that runs the host, and a network for them to
 find each other on.
 
-Local matters more than price here. The bottleneck is getting the rig standing, and a
-fortnight of international shipping on a critical part is a fortnight of not measuring
-anything. Other Sydney options: RC Hobbyland (Castle Hill) · Ultimate Hobbies (Parramatta).
+Local matters more than price for everything above the bearing. The bottleneck is getting the
+rig standing, and a fortnight of international shipping on a critical part is a fortnight of
+not measuring anything.
 
 ### Mechanics
 
