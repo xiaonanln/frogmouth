@@ -42,7 +42,7 @@ recording nights.
 | [SAFETY.md](SAFETY.md) | **Read before building one.** Fail-closed valve, never fire at humans, legal notes |
 | [CLAUDE.md](CLAUDE.md) | Project rules and build order |
 
-Roughly **A$345** of parts — full list in the V0 design doc.
+Roughly **A$290** of parts — full list in the V0 design doc.
 
 ## The open question
 

@@ -289,13 +289,12 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | **Camera** | Reolink RLC-520A PoE 5MP — 80° H FOV, 850 nm IR to 30 m | **$99.99** |
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
-| **Bearing** | heavy-duty aluminium lazy susan | **$31** |
+| **Impact sprinkler** | metal, ground-standing — supplies the bearing, the swivel, the base and the nozzle | **~$30** |
 | **Solenoid valve** | SparkFun ROB-10456 — 12V DC, normally closed, 3/4" BSP, 330 mA | **$22.55** |
 | **Relay module** | 5V 2-channel **opto-isolated** (Core CE05114) | **$5.70** |
 | Turret controller | Raspberry Pi — 3.3V GPIO, 5V on header pins 2 and 4 | already owned |
 | Servo supply | 6–7.4V, 3A+ BEC | ~$20 |
 | 12V supply | for the valve; 1A is ample at 330 mA | ~$15 |
-| Nozzle | adjustable, set to jet | ~$15 |
 | Flyback diode | 1N4004 or 1N4007, **across the solenoid** | ~$0.50 |
 | Pull-up resistor | 10 kΩ, on the relay input | ~$0.30 |
 | Bench indicator | 12V panel lamp, or an LED with a 1 kΩ series resistor | ~$2 |
@@ -304,13 +303,15 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
 | **Box** | plastic tub or toolbox with a lid, plus grommets | ~$25 |
-| **Swivel joint** | pressure-washer swivel, **mounted on the rotation axis** | ~$30 |
-| Swivel adapters | M22 ↔ 3/4" BSP | ~$10 |
-| | | **~$345** |
+| | | **~$290** |
 
-Not costed, because it depends on what you build it on: the **base and bracket** that hold
-the bearing, the servo and the camera together. The mechanics section below says what has to
-be true of it; timber and screws are a legitimate answer for V0.
+Uncosted: whatever holds the servo alongside the sprinkler, and the camera wherever it sees
+best. Timber and screws are a legitimate answer for V0.
+
+**Fallback, ~$86:** if the sprinkler's head cannot be coupled to the servo, the parts it was
+replacing come back — lazy susan bearing $31, pressure-washer swivel $30, M22-to-BSP adapters
+$10, adjustable nozzle $15 — and so does building a base. Decide this with one in your hand,
+not from here.
 
 The last three cost almost nothing and are each load-bearing: without the diode the valve's
 switch-off spike goes looking for the microcontroller, without the pull-up the valve opens
@@ -343,14 +344,14 @@ and the first one always ends up somewhere else.
 This is RC-hobby stock rather than electronics stock, which is why those shops are on the
 list at all.
 
-**Bunnings — walk in.** Nozzle, 3/4" BSP hose fittings, a short flexible hose for the tail,
+**Bunnings — walk in.** The metal impact sprinkler, 3/4" BSP hose fittings, a short flexible hose for the tail,
 PTFE thread tape, the box and its grommets, and whatever timber and fasteners the base is
 made of. **Do not buy a
 solenoid valve here** — the irrigation aisle is 24V AC.
 
-**Online, no hurry.** The lazy susan bearing, and the pressure-washer swivel with its M22-to-BSP
-adapters — search "pressure washer swivel joint", not "rotary union", which returns industrial
-parts at ten times the price.
+**Only if the sprinkler cannot be coupled.** Lazy susan bearing, and a pressure-washer swivel
+with M22-to-BSP adapters — search "pressure washer swivel joint", not "rotary union", which
+returns industrial parts at ten times the price.
 
 **Already owned:** the Raspberry Pi, the laptop that runs the host, and a network for them to
 find each other on.
@@ -440,18 +441,39 @@ hose decided.
 Two things make or break it:
 
 - **The swivel goes on the axis of rotation.** Off-axis it is just a lever arm in a new place.
-  Water comes up the axis, through the swivel, into the rotating head.
-- **The swivel seals, it does not carry.** The bearing still takes the weight. Same rule as
-  the servo shaft, for the same reason.
+- **The swivel seals, it does not carry.** The bearing takes the weight. Same rule as the
+  servo shaft, for the same reason.
 
-Pressure-washer swivel joints are the cheap way to get this: sealed bearings, free rotation,
-rated for thousands of PSI against the ~70 PSI a garden tap produces. Around $20–40, plus
-adapters, since they come in M22 rather than BSP. The document previously said to skip this
-and run a flexible tail instead, on the basis that a proper rotary union costs $50–200; that
-is industrial pricing and not what this needs.
+#### Start from an impact sprinkler
 
-Residual torque is not zero — line pressure loads the seal and the seal has friction — so
-*holds position against torque* stays on the definition of done. It just stops being a
+Rather than assembling that stack, buy something that already is it. A metal impact sprinkler
+is a rotating water head with the swivel **built in and concentric from the factory**, on a
+bearing sized for the job, on a heavy base that stands on the ground — which is where the
+nozzle wants to be anyway — with the longest-throwing nozzle in the garden aisle, since
+throwing far is the entire point of the type. About $30, against about $86 for the bearing,
+swivel, adapters and nozzle it replaces, and it deletes the base-building as well.
+
+The conversion is: **stop it turning itself, then drive it.**
+
+1. **Disable the impact mechanism** — the sprung arm that swings into the jet and knocks the
+   head round a notch at a time. Usually a pin or a screw.
+2. **Couple the servo** — a collar clamped to the rotating body with a lever arm, and a
+   pushrod from the servo. ±40° through a linkage is undemanding.
+3. **Deal with what is left inside** — these have a friction screw for sweep speed and a trip
+   mechanism for reversing at the arc limits. Friction may fight the servo or may help it
+   hold; the trip has to go.
+
+Five things to check with one in your hand, because none of them can be settled from here:
+
+- Does the head turn freely by hand once the arm is off?
+- Can the friction screw be backed off, and how far?
+- Is there anywhere to clamp a collar — a flat, a boss, wall thick enough to grip?
+- **Does the head creep once the water is on?** Any nozzle not pointing exactly through the
+  axis leaves a reaction torque, and this is the one question that needs water to answer.
+- Does the arc-limiting trip come out cleanly?
+
+Residual torque is not zero either way — line pressure loads the seal and seals have friction
+— so *holds position against torque* stays on the definition of done. It just stops being a
 question about a garden hose and becomes a question about a bearing.
 
 #### Mount the nozzle low. This is what removes the tilt axis.
