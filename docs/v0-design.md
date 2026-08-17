@@ -491,6 +491,25 @@ rotary joints in series, the servo commands one, and the resulting angle is unde
 impact arm still comes off in every arrangement — against a locked head it just hammers away
 wasting energy and making noise.
 
+##### The coupling is a backlash problem, not a strength problem
+
+Whatever grips the rotating part, the torque it carries is small — seal friction plus whatever
+reaction the nozzle leaves, with gravity contributing nothing about a vertical axis. So the
+clamp does not need to be fierce.
+
+What it must not have is **play**. A loose grip does not fail by slipping catastrophically; it
+fails by turning a commanded angle into an approximate one. On a 25 mm body with a 50 mm lever,
+1 mm of slop is about 1° — the same order as the whole aiming budget. It would present as
+calibration drifting, which is expensive to chase.
+
+Hence: **prefer a shape that cannot slip over a grip that must not slip.** If the head offers a
+flat, a hex or a boss, drive that. Form closure beats friction closure, needs less clamping
+force, and does not loosen as things get wet.
+
+This also cuts the other way. If gripping the head turns out to be easy, the main objection to
+arrangement A evaporates and it saves $40. Which is the point: these are things to look at, not
+to reason about.
+
 Whichever wins, four things decide it and none can be answered from here:
 
 - Is there anywhere to clamp — a flat, a boss, wall thick enough to grip?
