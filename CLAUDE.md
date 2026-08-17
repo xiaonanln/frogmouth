@@ -52,7 +52,7 @@ be reached.
 
 ## Constraints that shape the code
 
-- The host sends the ESP32 exactly two numbers: **angle and spray duration**. All
+- The host sends the turret controller exactly two numbers: **angle and spray duration**. All
   decisions are on the host; firmware executes and enforces safety only.
 - Pixel → angle uses the **pinhole model**, `θ = atan(x_norm · tan(hfov/2))`. **Not**
   linear interpolation — a linear map systematically under-shoots mid-frame targets.
@@ -66,9 +66,9 @@ be reached.
 
 ```
 1. Mount the camera and record several nights   ← IR samples: training data AND video material
-2. V0: mouse click → angle → spray              ← prove the mechanics
-3. Measure calibration on the real rig
-4. Detection model + never-fire-at-humans rule
+2. Move the servo and the valve by hand         ← V0 stage 1
+3. Click → angle → spray, and calibrate on it   ← V0 stage 2
+4. Detection model + never-fire-at-humans rule  ← V0 stage 3, the loop closes
 5. Six-week habituation experiment
 ```
 

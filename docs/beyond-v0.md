@@ -19,8 +19,7 @@ Reading their troubleshooting pages is cheaper than reproducing their failures.
 A sealed box with a **gasket** and a **cable gland for every entry** — not a plastic box
 with holes drilled in it. FarmBot ships exactly this (box, lid, gasket, latches, glands).
 
-The current bill of materials has an ESP32, a relay module and two supplies with nowhere to
-live. That is fine on a bench and not fine in a garden.
+The bill of materials has a Pi, a relay module and two supplies with nowhere to live. That is fine on a bench and not fine in a garden.
 
 ## Fuse
 
@@ -52,16 +51,43 @@ FarmBot rates its solenoid valve and pressure regulator as failing **above 60°C
 temperature a dark plastic body in direct Sydney summer sun reaches easily. Their cheapest
 mitigation is the obvious one: put it in shade.
 
-Related, for the battery version rather than now: a Raspberry Pi is rated 0–70°C and is the
-most heat-fragile part of their machine. Moving computation outdoors imports that limit.
+The same page rates a Raspberry Pi at 0–70°C and calls it the most heat-fragile part of
+their machine. Ours is in the turret box, so that limit is now inherited rather than
+hypothetical — see the controller section below.
 
-## Shielded serial
+## The turret controller becomes a microcontroller
 
-**Triggers: a long permanent cable run.**
+**Triggers: unattended running, and again at the battery version.**
 
-FarmBot's camera cable specifies a *shielded* USB cable "or there will be EMI issues". The
-host-to-ESP32 link is USB serial and will eventually be a long outdoor run. A short bench
-cable is fine; the permanent installation is where this appears.
+V0 runs the turret side on a Raspberry Pi because there was one on the shelf, and for an
+attended hour that is the right call. Four things push that slot to a microcontroller once
+nobody is watching:
+
+- **Boot window.** Around thirty seconds where GPIO is an input and only the pull-up holds
+  the valve shut. Fine with a hand on the tap; a long time at 3am. A microcontroller runs
+  its own code in well under a second.
+- **A hung process.** A Pi keeps its GPIO state when a process is `SIGKILL`ed, so a crash
+  between open and close leaves the valve open. Linux's hardware watchdog (`/dev/watchdog`)
+  does answer this — a reset returns GPIO to inputs and the pull-up closes the valve — but
+  it must be deliberately enabled. That is the difference between a guarantee and a
+  configuration.
+- **The SD card.** This project expects power cuts. Mount the executor's root filesystem
+  read-only as soon as it is left outside; it writes nothing anyway.
+- **Heat and power.** 0–70°C against 85°C for a part sitting in the turret box, and no
+  deep-sleep mode at all for a battery version.
+
+None of this makes the Pi wrong for V0. It makes the swap scheduled work rather than a
+surprise.
+
+## Cable runs
+
+**Triggers: a long permanent run.**
+
+FarmBot's camera cable specifies a *shielded* USB cable "or there will be EMI issues".
+Moving the host link to Ethernet mostly dissolves that particular problem — twisted pair is
+differential and built for noisy runs — so what is left is the camera's PoE run and the
+short analogue lines inside the turret box. Worth noting mainly because it is a hazard the
+architecture change removed rather than one still owed.
 
 ## Drain before a freeze
 

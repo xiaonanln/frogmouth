@@ -1,18 +1,27 @@
 # V0 design
 
-**Goal of V0: prove the mechanics, and nothing else.**
+**Goal of V0: the whole loop, working by itself.**
 
-`mouse click in a video frame → turret turns → water fires at that point`
+`camera sees an animal → host classifies it and computes the angle → turret turns → water fires`
 
-No detection model, no autonomy, no night operation. A human is the detector. If this
-does not work reliably, nothing built on top of it will.
-
-V0 is finished when **someone can click a spot in the frame and the water lands there,
-repeatably, for an hour, without the valve ever sticking open.**
+V0 is finished when **the rig does that unaided, repeatably, for an hour, without ever
+firing at a person and without the valve ever sticking open.**
 
 ---
 
-## Why a human is the detector first
+## What V0 does not chase
+
+**Not reliability, not power, not weatherproofing, not uptime.** V0 runs for an hour with
+someone standing next to it, on a day chosen for the purpose, and then gets carried back
+inside. Anything whose payoff arrives after the first week belongs in
+[beyond-v0.md](beyond-v0.md), not here.
+
+The exception is **safety, which is not the same thing as reliability.** V0 fires by
+itself, so it can hit a person — and that is a property of the *first* autonomous shot, not
+of the hundredth hour. The never-fire-at-humans rule, the duration cap and the fail-closed
+valve are in from the start. Everything else that merely sounds prudent can wait.
+
+## Three stages, and every one of them is kept
 
 The riskiest parts of this project are mechanical and geometric, not perceptual:
 
@@ -20,18 +29,45 @@ The riskiest parts of this project are mechanical and geometric, not perceptual:
 - Does the water land where the geometry says it should?
 - Does the valve close every single time?
 
-A detection model would obscure all of these — a miss could be bad aiming, bad
-calibration, bad timing, or bad classification, and you would not know which. Removing
-the model removes three of the four.
+So the detector goes in **last**. Each stage below removes suspects before the next one adds
+any, and none of them is scaffolding — all three survive into the finished tool.
+
+### Stage 1 — move each thing by hand
+
+Make the servo turn. Make the valve open. **Separately, one typed command at a time:** `nc`
+into the turret and send `AIM 30`, then `SPRAY 500`.
+
+This is why `AIM` and `SPRAY` exist in the protocol as commands in their own right rather
+than only as steps inside `FIRE`. Nothing is aimed at anything and nothing is calibrated
+yet — the only questions are whether the two actuators obey at all, and whether the valve
+shuts when told to.
+
+### Stage 2 — click to fire
+
+A human is the detector. With a person clicking, a miss can only be aiming, calibration or
+timing — the classifier is not yet a suspect.
+
+This stage is also **how calibration is performed**: step 2 of the procedure below is
+*click it in the frame*. So it stays in the tool permanently, and it stays the way any
+future aiming problem gets separated from any future classification problem.
+
+### Stage 3 — detect and fire
+
+Swap the click for the detector. By this point everything underneath has been proven, so a
+new failure points at the model.
 
 ## Scope
 
-**In:** serial link · servo pan with mechanical limits · valve open/close with a hard
+**In:** network link · servo pan with mechanical limits · valve open/close with a hard
 duration cap · pixel → angle mapping · empirical calibration · click-to-fire UI over a
-live frame · event log · safety (limits, cooldown, watchdog, fail-closed)
+live frame · **animal detection** · **the never-fire-at-humans rule** · **autonomous
+firing** · event log · safety (limits, cooldown, watchdog, fail-closed)
 
-**Out:** detection, tracking, classification · tilt · night operation and IR · wireless,
-battery, solar · any autonomous firing
+**Out:** tilt · night operation and IR · wireless, battery, solar
+
+Night is out of V0 even though the most interesting targets are nocturnal. That is a
+deliberate ordering: daylight targets — brush turkeys, cats, birds — are enough to prove
+the loop, and infrared brings its own perception problem that deserves its own attempt.
 
 ---
 
@@ -42,7 +78,8 @@ Camera (fixed, does not rotate)
      │ RTSP
      ▼
 ┌───────────── Host (indoor computer) ─────────────┐
-│  frame ──► UI: click to fire                      │
+│  frame ──► detector ──► never-fire-at-humans      │
+│      └───► UI: click to fire (calibration)        │
 │                    │                              │
 │            calibration: pixel_x → angle           │
 │                    │                              │
@@ -50,9 +87,10 @@ Camera (fixed, does not rotate)
 │                    │                              │
 │            event log (JSONL)                      │
 └────────────────────┼──────────────────────────────┘
-                     │ serial, ASCII
+                     │ network, ASCII
        ┌─────────────▼──────────────┐
-       │           ESP32             │
+       │      Turret controller      │
+       │      (Raspberry Pi)         │
        │  · clamp angle              │
        │  · cap spray duration       │
        │  · watchdog → close valve   │
@@ -62,8 +100,19 @@ Camera (fixed, does not rotate)
         servo            relay ──► 12V NC valve
 ```
 
-The host decides *what*. The firmware decides *whether it is safe* and does it. Neither
-duplicates the other's job — the host sends exactly two numbers, an angle and a duration.
+The host decides *what*. The turret controller decides *whether it is safe* and does it.
+Neither duplicates the other's job — the host sends exactly two numbers, an angle and a
+duration.
+
+**Why a Raspberry Pi for V0:** because there is one on the shelf. V0's bar is one hour of
+clicking with someone standing there, and a Pi drives a servo and a relay perfectly well.
+The reasons a microcontroller eventually wins this slot — boot window, no OS to hang, an SD
+card that survives power cuts, 85°C instead of 70°C, microamps in sleep for a battery
+version — are all *unattended, outdoor, long-run* reasons. They are recorded in
+[beyond-v0.md](beyond-v0.md) and none of them apply to a demo.
+
+The rest of this document says **firmware** for the turret side. On a Pi it is a service
+rather than firmware, but the job is unchanged: execute and enforce, never decide.
 
 **Build order:** get the mouse-click path working before swapping in detected
 coordinates, so the riskiest part is proven first.
@@ -72,8 +121,12 @@ coordinates, so the riskiest part is proven first.
 
 ## Wire protocol
 
-Line-based ASCII over USB serial, 115200 baud. Deliberately human-readable: when the rig
-misbehaves you can open a serial terminal and drive it by hand, with no tooling.
+Line-based ASCII over TCP. Deliberately human-readable: when the rig misbehaves you can
+`nc` into it and drive it by hand, with no tooling.
+
+A dropped connection is normal on a network in a way it is not on a cable, which makes the
+watchdog load-bearing rather than decorative: **silence closes the valve**, and the host
+reconnecting is an ordinary event rather than an error.
 
 | Host → device | Device → host |
 |---|---|
@@ -186,7 +239,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | **Bearing** | heavy-duty aluminium lazy susan | **$31** |
 | **Solenoid valve** | SparkFun ROB-10456 — 12V DC, normally closed, 3/4" BSP, 330 mA | **$22.55** |
 | **Relay module** | 5V 2-channel **opto-isolated** (Core CE05114) | **$5.70** |
-| ESP32 | any dev board | ~$15 |
+| Turret controller | Raspberry Pi — 3.3V GPIO, 5V on header pins 2 and 4 | already owned |
 | Servo supply | 6–7.4V, 3A+ BEC | ~$20 |
 | 12V supply | for the valve; 1A is ample at 330 mA | ~$15 |
 | Nozzle | adjustable, set to jet | ~$15 |
@@ -197,7 +250,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 
 The last three cost almost nothing and are each load-bearing: without the diode the valve's
 switch-off spike goes looking for the microcontroller, without the pull-up the valve opens
-while the ESP32 boots, and without the indicator there is no way to prove the valve closes
+while the Pi boots, and without the indicator there is no way to prove the valve closes
 before committing water to the question.
 
 ### Ordering
@@ -255,8 +308,8 @@ switches off will destroy a MOSFET and can take the microcontroller with it. Thi
 most common way this kind of project dies overnight. Opto-isolated relay modules normally
 include the protection.
 
-**4. Never power the servo from the ESP32's regulator.** A 35 kg servo's stall current
-will brown out the board. Separate 6–7.4V supply, common ground.
+**4. Never power the servo from the controller's own supply.** A 35 kg servo's stall
+current will brown out the board. Separate 6–7.4V supply, common ground.
 
 ### Wiring the valve
 
@@ -264,7 +317,7 @@ Three different voltages meet at the relay, and confusing them is how this goes 
 
 | Circuit | Volts | What is on it |
 |---|---|---|
-| Signal | 3.3V | the ESP32 GPIO |
+| Signal | 3.3V | the Pi's GPIO |
 | Coil | 5V | the relay's electromagnet |
 | Contact | 12V | the solenoid valve |
 
@@ -275,13 +328,12 @@ separate contact rating — 10A @ 28VDC here, against a 330 mA load.
 On these boards the trigger is **active-LOW**, and on a non-isolated module one pin feeds
 both the coil and the input, so the two requirements collide:
 
-- the input must sit at **3.3V**, or the ESP32's logic high cannot fully switch it off
+- the input must sit at **3.3V**, or the controller's logic high cannot fully switch it off
 - the coil needs its full **5V**, or the relay pulls in weakly
 
-A 5V coil driven at 3.3V is below its pull-in spec. It will often work on a warm bench,
-which is what makes it dangerous: a contact that closes weakly heats up and can weld —
-and a welded contact is a valve stuck open, the one failure this whole design exists to
-prevent. Vendor tutorials do exactly this. Do not copy them.
+A 5V coil driven at 3.3V is below its pull-in spec — it works on a warm bench and not
+dependably anywhere else, and a contact that closes weakly can weld shut, which is a valve
+stuck open. Vendor tutorials wire it that way; do not copy them.
 
 Removing the module's VCC/JD-VCC jumper separates the two rails and both requirements are
 met at once. That is the reason to buy the isolated board.
@@ -291,10 +343,10 @@ met at once. That is the reason to buy the isolated board.
 - Solenoid through the relay's **NO** contact — de-energised relay, no water. Note the
   naming collision: the *valve* is normally closed and the *relay* has an NC terminal, and
   they are unrelated. Wiring to the relay's NC inverts everything, so the valve opens
-  whenever the ESP32 is off.
-- **10k pull-up on the input**, to a non-strapping GPIO (not 0, 2, 12, 15). An ESP32 pin is
-  high-impedance during boot; active-LOW plus a floating pin means the valve opens while
-  the board is still starting, which breaks *valve closed on boot*.
+  whenever the controller is off.
+- **10k pull-up on the input.** GPIO is an input for the whole of boot — around thirty
+  seconds on a Pi — and active-LOW plus a floating pin means the relay energises. The
+  pull-up is what holds the valve closed across that window, so it is not optional.
 - **A flyback diode across the solenoid.** The diode on a relay module protects the
   module's own coil, not your load, and the solenoid is the larger inductor.
 - Verify with a multimeter across the contact through a full power cycle, before the LED
@@ -329,8 +381,10 @@ Two independent layers, both defaulting to *water off*. Full rationale in
 The valve is **normally closed**: no power, no water. A cut cable, a dead board, a crashed
 host and a pulled plug all end the same way.
 
-V0 fires only on a human click, so the *never fire at humans* rule is not yet needed — but
-the controller is where it will live, and nothing in V0 should make that awkward.
+V0 fires by itself, so **never fire at humans** is in from the first autonomous shot, not
+deferred. It lives in the host controller, above the detector and independent of it: if
+anything human-shaped is anywhere in frame, no shot is issued, whatever the animal
+classifier thinks. A rule, not a threshold — see [SAFETY.md](../SAFETY.md).
 
 ---
 
@@ -373,7 +427,7 @@ change shape.
 simulated serial peer proves only that the host agrees with a fiction someone wrote. It
 would pass happily while the servo stalls, the relay chatters, or the board browns out.
 
-What replaces it is a **dry bench**: the real ESP32, the real servo, and an indicator in
+What replaces it is a **dry bench**: the real Pi, the real servo, and an indicator in
 place of the solenoid on the relay's 12V circuit — either a 12V panel lamp, or an LED with
 a series resistor sized for 12V (about 1 kΩ gives ~10 mA). Not a bare LED: across 12V it
 draws whatever the supply will give and dies in the first shot, which is a poor way to
@@ -411,14 +465,20 @@ it sits on a moving flexible tail rather than fixed plumbing.
 
 ## Definition of done
 
-- [ ] `PING` round-trips over real serial
-- [ ] Dry bench passes a full session on the LED before water is connected
+- [ ] `PING` round-trips over the real link
+- [ ] `AIM` turns the servo and `SPRAY` opens the valve, typed by hand, one at a time
+- [ ] Dry bench passes a full session on the indicator before water is connected
 - [ ] Servo reaches both mechanical limits and holds against hose torque
 - [ ] Valve opens and closes; **never observed stuck open**
 - [ ] Watchdog closes the valve when the host is killed mid-spray
 - [ ] Calibration solved from measured points; water lands within a jet-width of a clicked
       target across the frame
 - [ ] One hour of clicking with no missed close and no drift
+- [ ] Detector runs on the live stream and produces angles the turret acts on
+- [ ] **No shot is issued while a person is in frame** — checked by walking into frame
+      mid-session, repeatedly, including alongside an animal
+- [ ] One hour unattended-in-principle: firing on its own, with someone watching but not
+      touching
 - [ ] Events logged and readable
 
-Only then: point the camera at the garden overnight and start collecting IR footage.
+Only then: night, infrared, and the six-week experiment.
