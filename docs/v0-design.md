@@ -131,6 +131,14 @@ card that survives power cuts, 85°C instead of 70°C, microamps in sleep for a 
 version — are all *unattended, outdoor, long-run* reasons. They are recorded in
 [beyond-v0.md](beyond-v0.md) and none of them apply to a demo.
 
+**The one thing the Pi costs in V0:** Linux is not a real-time system, so a servo driven by
+software PWM twitches whenever the machine is busy. That reads as a mechanical fault — which
+is expensive on a rig whose headline risk *is* mechanical, and you can lose an evening to the
+bearing before suspecting the pulse train. Drive the servo from a **hardware PWM pin**
+(GPIO 12, 13, 18 or 19) or through **`pigpio`**, which generates pulses by DMA rather than
+from userspace. A PCA9685 breakout is the fallback if neither is convenient. Choose before
+building, not after the first twitch.
+
 The rest of this document says **firmware** for the turret side. On a Pi it is a service
 rather than firmware, but the job is unchanged: execute and enforce, never decide.
 
