@@ -176,11 +176,15 @@ negotiable: spraying while turning paints an arc across whatever is in between.
 for a comparable valve, ≤0.15 s to open and ≤0.3 s to close — so the water is late to start
 and later to stop. Three consequences:
 
-- The shortest useful shot is bounded from below. A 100 ms command is mostly lag.
 - The commanded number and the delivered volume are not proportional at short durations,
   so the habituation experiment must randomise over *measured* shots, not over `<ms>`.
 - The turn-then-spray rule needs its mirror: **wait out the closing lag before turning
   away**, or the tail of the shot paints the arc that `FIRE` ordering exists to prevent.
+- The lag is not wasted water. A part-open valve throttles pressure at a fixed nozzle, so the
+  jet is short while the valve is still opening and reaches full range once it is — **every
+  shot sweeps near to far on its own**, and back again as it closes. A short command is a
+  short-range shot rather than a failed one, which makes duration a crude range knob that
+  costs nothing. How far the jet actually reaches mid-transient is unmeasured; see below.
 
 The lag is a property of the valve that was bought, so it is measured on arrival like
 everything else, and the firmware's settle and post-spray waits are set from that.
@@ -433,7 +437,9 @@ calculation.
 
 ##### Varying the nozzle opening is not a range control
 
-It looks like one — open wide for near, narrow for far — and it fails three ways.
+It looks like one — open wide for near, narrow for far — and it fails three ways. (Throttling
+*upstream* is a different matter and happens for free every time the valve opens; that is in
+the protocol section.)
 
 **The physics runs backwards.** Exit velocity comes from pressure, not from aperture; the
 aperture sets flow. A wide opening flows more, drops more pressure in the hose, and arrives
@@ -628,7 +634,8 @@ that covers this rig, and all three can stop V0 dead:
 |---|---|---|
 | **Flow at the real tap** | bucket and stopwatch, valve wide open | Decides whether the jet reaches at all. The published "~3 L/min" is quoted at the 3 PSI *minimum*, not at mains |
 | **Does it open at your pressure** | listen for the click with the tap on | It is pilot-operated, so it needs pressure to open. A comparable system quotes ~25 PSI as the practical floor — well under mains, but a rainwater tank will not do it |
-| **Open and close lag** | stopwatch on the indicator vs the water | Sets the settle waits and the floor on `<ms>`, per the protocol section |
+| **Open and close lag** | stopwatch on the indicator vs the water | Sets the settle waits, per the protocol section |
+| **How the jet sweeps while the valve opens** | film one shot in slow motion on a phone | A part-open valve throttles a fixed nozzle, so each shot sweeps near→far unaided. This says how much near-field coverage comes free, and therefore whether short commands are usefully short-range shots |
 
 Also check the hose-to-valve joint under full pressure before leaving it unattended for
 even an hour. That connection is the reported leak point on comparable hardware, and here
