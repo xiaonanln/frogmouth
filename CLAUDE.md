@@ -52,12 +52,17 @@ be reached.
 
 ## Constraints that shape the code
 
-- The host sends the ESP32 exactly two numbers: **angle and spray duration**. All
+- The host sends the turret controller exactly two numbers: **angle and spray duration**. All
   decisions are on the host; firmware executes and enforces safety only.
 - Pixel → angle uses the **pinhole model**, `θ = atan(x_norm · tan(hfov/2))`. **Not**
   linear interpolation — a linear map systematically under-shoots mid-frame targets.
-- Parallax: the camera must be mounted within ~20 cm of the turret axis, or close
-  targets will be missed.
+- Camera placement is free — calibration is a measured map from image position to angle and
+  absorbs the geometry. Two consequences: off-axis, calibrate over an *area* rather than a
+  line, and the map assumes the animal is **on the ground**, so climbers read as further away
+  than they are. Co-axial mounting is the only arrangement without that assumption.
+- **Pan only, and the nozzle is mounted low.** These are one decision: a jet leaving near the
+  ground stays at small-animal height for most of its flight, so bearing is the only quantity
+  that has to be right. Raise the nozzle and the tilt axis comes back.
 - The detector must work on **bursts of frames and cold starts**, not a continuous
   stream with long-lived tracking state. A future battery version wakes from sleep with
   no history; if the logic depends on 30 seconds of tracking, it will need a rewrite.
@@ -66,9 +71,9 @@ be reached.
 
 ```
 1. Mount the camera and record several nights   ← IR samples: training data AND video material
-2. V0: mouse click → angle → spray              ← prove the mechanics
-3. Measure calibration on the real rig
-4. Detection model + never-fire-at-humans rule
+2. Move the servo and the valve by hand         ← V0 stage 1
+3. Click → angle → spray, and calibrate on it   ← V0 stage 2
+4. Detection model + never-fire-at-humans rule  ← V0 stage 3, the loop closes
 5. Six-week habituation experiment
 ```
 
@@ -108,4 +113,7 @@ Flush and `fsync` on every write — a power cut at 3am must not lose the night.
 - **Every change goes through a PR.** Direct pushes to `main` are blocked by the
   `pre-push` hook and by branch protection.
 - Enable the hook after cloning: `git config core.hooksPath .githooks`
-- One PR does one thing. Squash merge.
+- Squash merge.
+- **While the project is still design-only, batch related changes into one PR.** Splitting
+  a documentation pass into five PRs costs more review than it saves. One-PR-one-thing
+  starts mattering once there is code to bisect.

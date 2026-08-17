@@ -38,10 +38,11 @@ recording nights.
 | | |
 |---|---|
 | [docs/v0-design.md](docs/v0-design.md) | V0 scope, protocol, geometry, calibration, hardware, definition of done |
+| [docs/beyond-v0.md](docs/beyond-v0.md) | What outdoor unattended operation adds, and when each part of it starts to matter |
 | [SAFETY.md](SAFETY.md) | **Read before building one.** Fail-closed valve, never fire at humans, legal notes |
 | [CLAUDE.md](CLAUDE.md) | Project rules and build order |
 
-Roughly **A$300** of parts — full list in the V0 design doc.
+Roughly **A$345** of parts — full list in the V0 design doc.
 
 ## The open question
 
