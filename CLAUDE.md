@@ -108,4 +108,7 @@ Flush and `fsync` on every write — a power cut at 3am must not lose the night.
 - **Every change goes through a PR.** Direct pushes to `main` are blocked by the
   `pre-push` hook and by branch protection.
 - Enable the hook after cloning: `git config core.hooksPath .githooks`
-- One PR does one thing. Squash merge.
+- Squash merge.
+- **While the project is still design-only, batch related changes into one PR.** Splitting
+  a documentation pass into five PRs costs more review than it saves. One-PR-one-thing
+  starts mattering once there is code to bisect.

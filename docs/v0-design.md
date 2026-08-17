@@ -88,6 +88,19 @@ misbehaves you can open a serial terminal and drive it by hand, with no tooling.
 `FIRE` turns first, waits for the servo to settle, then opens the valve. The order is not
 negotiable: spraying while turning paints an arc across whatever is in between.
 
+**`<ms>` is relay-closed time, not water-out time.** A solenoid lags in both directions —
+for a comparable valve, ≤0.15 s to open and ≤0.3 s to close — so the water is late to start
+and later to stop. Three consequences:
+
+- The shortest useful shot is bounded from below. A 100 ms command is mostly lag.
+- The commanded number and the delivered volume are not proportional at short durations,
+  so the habituation experiment must randomise over *measured* shots, not over `<ms>`.
+- The turn-then-spray rule needs its mirror: **wait out the closing lag before turning
+  away**, or the tail of the shot paints the arc that `FIRE` ordering exists to prevent.
+
+The lag is a property of the valve that was bought, so it is measured on arrival like
+everything else, and the firmware's settle and post-spray waits are set from that.
+
 ---
 
 ## Geometry
@@ -171,13 +184,13 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
 | **Bearing** | heavy-duty aluminium lazy susan | **$31** |
-| **Solenoid valve** | 12V DC, normally closed, 3/4" BSP | ~$25–40 |
-| Relay module | 12V, opto-isolated | ~$10 |
+| **Solenoid valve** | SparkFun ROB-10456 — 12V DC, normally closed, 3/4" BSP, 330 mA | **$22.55** |
+| **Relay module** | 5V 2-channel **opto-isolated** (Core CE05114) | **$5.70** |
 | ESP32 | any dev board | ~$15 |
 | Servo supply | 6–7.4V, 3A+ BEC | ~$20 |
-| 12V supply | for the valve | ~$15 |
+| 12V supply | for the valve; 1A is ample at 330 mA | ~$15 |
 | Nozzle | adjustable, set to jet | ~$15 |
-| | | **~$300** |
+| | | **~$290** |
 
 Sydney suppliers: Core Electronics · Little Bird (Hornsby) · Jaycar (Hornsby) ·
 RC Hobbyland (Castle Hill) · Ultimate Hobbies (Parramatta)
@@ -199,11 +212,21 @@ flexible tail is fine over ±60°, comfortably more than the ±40° the camera's
 ### Four mistakes that cost a rebuild
 
 **1. The valve must be 12V DC, not 24V AC.** Most irrigation valves sold in hardware
-stores are 24V AC — standard for sprinkler controllers, and not drivable from an ESP32
-and a MOSFET.
+stores are 24V AC — a decades-old standard, because a bare transformer produces it with no
+electronics at all. Pick one up without checking and you get the default, which is wrong.
 
-**2. BSP threads, not NPT.** Australian garden fittings are BSP. The wrong thread means
-the whole batch is useless.
+A relay *could* switch 24V AC — contacts do not care, and AC is gentler on them than DC.
+The reasons for DC are the other ones: a 12V DC rail can also feed the 5V and 6–7.4V rails,
+where 24V AC is a dead end only the valve can use; a DC valve can be verified with nothing
+but a battery touched to its leads, before any electronics exist; and it leaves the option
+of dropping the relay for a MOSFET later. (A MOSFET genuinely cannot switch AC — it
+conducts one way and its body diode conducts the other — so choosing AC would close that
+door permanently.)
+
+**2. BSP threads, not NPT — and 3/4", because that is what an Australian outdoor tap is.**
+The wrong thread means the whole batch is useless. Watch for 1/2" NPS in particular: same
+14 TPI as BSP but a 60° flank instead of 55°, so it threads in, feels seated, and then
+weeps under pressure. Look for the flank angle stated explicitly.
 
 **3. You need a flyback diode.** A solenoid is an inductor; the reverse spike when it
 switches off will destroy a MOSFET and can take the microcontroller with it. This is the
@@ -212,6 +235,48 @@ include the protection.
 
 **4. Never power the servo from the ESP32's regulator.** A 35 kg servo's stall current
 will brown out the board. Separate 6–7.4V supply, common ground.
+
+### Wiring the valve
+
+Three different voltages meet at the relay, and confusing them is how this goes wrong:
+
+| Circuit | Volts | What is on it |
+|---|---|---|
+| Signal | 3.3V | the ESP32 GPIO |
+| Coil | 5V | the relay's electromagnet |
+| Contact | 12V | the solenoid valve |
+
+The "5V" in a relay module's name describes the **coil only**. What it can switch is the
+separate contact rating — 10A @ 28VDC here, against a 330 mA load.
+
+**The opto-isolated module is not optional, and spike isolation is only half the reason.**
+On these boards the trigger is **active-LOW**, and on a non-isolated module one pin feeds
+both the coil and the input, so the two requirements collide:
+
+- the input must sit at **3.3V**, or the ESP32's logic high cannot fully switch it off
+- the coil needs its full **5V**, or the relay pulls in weakly
+
+A 5V coil driven at 3.3V is below its pull-in spec. It will often work on a warm bench,
+which is what makes it dangerous: a contact that closes weakly heats up and can weld —
+and a welded contact is a valve stuck open, the one failure this whole design exists to
+prevent. Vendor tutorials do exactly this. Do not copy them.
+
+Removing the module's VCC/JD-VCC jumper separates the two rails and both requirements are
+met at once. That is the reason to buy the isolated board.
+
+**Then:**
+
+- Solenoid through the relay's **NO** contact — de-energised relay, no water. Note the
+  naming collision: the *valve* is normally closed and the *relay* has an NC terminal, and
+  they are unrelated. Wiring to the relay's NC inverts everything, so the valve opens
+  whenever the ESP32 is off.
+- **10k pull-up on the input**, to a non-strapping GPIO (not 0, 2, 12, 15). An ESP32 pin is
+  high-impedance during boot; active-LOW plus a floating pin means the valve opens while
+  the board is still starting, which breaks *valve closed on boot*.
+- **A flyback diode across the solenoid.** The diode on a relay module protects the
+  module's own coil, not your load, and the solenoid is the larger inductor.
+- Verify with a multimeter across the contact through a full power cycle, before the LED
+  goes on the bench, let alone water.
 
 ### Do not use a solar camera
 
@@ -286,23 +351,41 @@ change shape.
 simulated serial peer proves only that the host agrees with a fiction someone wrote. It
 would pass happily while the servo stalls, the relay chatters, or the board browns out.
 
-What replaces it is a **dry bench**: the real ESP32, the real servo, and an LED across the
-relay output where the solenoid will go. Everything behaves as it will in the garden
-except that nothing gets wet — so the two most expensive silent errors are visible before
-a hose is connected:
+What replaces it is a **dry bench**: the real ESP32, the real servo, and an indicator in
+place of the solenoid on the relay's 12V circuit — either a 12V panel lamp, or an LED with
+a series resistor sized for 12V (about 1 kΩ gives ~10 mA). Not a bare LED: across 12V it
+draws whatever the supply will give and dies in the first shot, which is a poor way to
+learn that the valve stayed open. Everything else behaves as it will in the garden except
+that nothing gets wet, so the two most expensive silent errors are visible before a hose is
+connected:
 
 | Error | How it shows on the dry bench |
 |---|---|
 | Calibration wrong — *"it aims left but sprays right"* | servo turns to the wrong angle for a known click |
-| Safety wrong — *the valve stays open* | LED stays lit past the duration cap, after `STOP`, or when the host is killed mid-spray |
+| Safety wrong — *the valve stays open* | indicator stays lit past the duration cap, after `STOP`, or when the host is killed mid-spray |
 
-**Connect water only after the LED has behaved for a full session**, including a host kill
-mid-spray and a power cut. An LED that stays on is a bug; a valve that stays open is a
+**Connect water only after the indicator has behaved for a full session**, including a host
+kill mid-spray and a power cut. A lamp that stays on is a bug; a valve that stays open is a
 flooded garden and a lesson about normally-closed valves you did not need to pay for.
 
 Geometry and the calibration solve stay ordinary unit-tested functions — pixel in, angle
 out, no device of any kind involved. That is arithmetic rather than simulation, and it
 costs nothing to check.
+
+## Measure on arrival
+
+Rule 4 applies to the valve as much as to the lens. Three numbers are not on any datasheet
+that covers this rig, and all three can stop V0 dead:
+
+| Measure | How | Why it blocks V0 |
+|---|---|---|
+| **Flow at the real tap** | bucket and stopwatch, valve wide open | Decides whether the jet reaches at all. The published "~3 L/min" is quoted at the 3 PSI *minimum*, not at mains |
+| **Does it open at your pressure** | listen for the click with the tap on | It is pilot-operated, so it needs pressure to open. A comparable system quotes ~25 PSI as the practical floor — well under mains, but a rainwater tank will not do it |
+| **Open and close lag** | stopwatch on the indicator vs the water | Sets the settle waits and the floor on `<ms>`, per the protocol section |
+
+Also check the hose-to-valve joint under full pressure before leaving it unattended for
+even an hour. That connection is the reported leak point on comparable hardware, and here
+it sits on a moving flexible tail rather than fixed plumbing.
 
 ## Definition of done
 

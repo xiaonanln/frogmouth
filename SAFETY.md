@@ -40,9 +40,26 @@ public footpath. Check local privacy law and aim accordingly.
 
 Solenoid valves are inductive. Switching one without a flyback diode will
 destroy your MOSFET and possibly your microcontroller. Use an opto-isolated
-relay module (they normally include protection) or add the diode yourself.
+relay module and **add a diode across the solenoid yourself** — the diode on a
+relay module protects that module's own coil, not the load you attached to it.
 
 Do not power a high-torque servo from the microcontroller's regulator.
+
+Mains, water and outdoors in the same place: use an **RCD-protected outlet**.
+
+Two wiring mistakes open the valve when nothing asked it to, and both defeat
+rule 1 while looking correct:
+
+- The relay has an **NC** terminal and the valve is **normally closed**. These
+  are unrelated. Wire the valve through the relay's **NO** contact; using NC
+  inverts everything, and water flows whenever the controller is off.
+- These relay modules trigger on a **low** input, and a microcontroller pin is
+  high-impedance while it boots. Without a pull-up the valve opens during
+  start-up. Pull the input high and keep off the strapping pins.
+
+Confirm both with a multimeter across the contact, through a full power cycle,
+before water is anywhere near the rig. Wiring detail is in
+[docs/v0-design.md](docs/v0-design.md).
 
 ## No warranty
 
