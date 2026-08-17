@@ -277,7 +277,8 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Hose fittings | 3/4" BSP, tap to valve | ~$15 |
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
-| | | **~$285** |
+| **Box** | plastic tub or toolbox with a lid, plus grommets | ~$25 |
+| | | **~$310** |
 
 Not costed, because it depends on what you build it on: the **base and bracket** that hold
 the bearing, the servo and the camera together. The mechanics section below says what has to
@@ -315,7 +316,8 @@ This is RC-hobby stock rather than electronics stock, which is why those shops a
 list at all.
 
 **Bunnings — walk in.** Nozzle, 3/4" BSP hose fittings, a short flexible hose for the tail,
-PTFE thread tape, and whatever timber and fasteners the base is made of. **Do not buy a
+PTFE thread tape, the box and its grommets, and whatever timber and fasteners the base is
+made of. **Do not buy a
 solenoid valve here** — the irrigation aisle is 24V AC.
 
 **Online, no hurry.** The lazy susan bearing. Nothing else waits on it, so it is the one item
@@ -360,6 +362,32 @@ back, which is the whole V0 posture; finding it a permanent home is
 [beyond-v0](beyond-v0.md) work. If no PoE switch were available, the camera's own 12V input
 is the fallback — kept off the valve's rail, since the solenoid puts switching noise there
 and a camera that glitches only while spraying is a miserable thing to diagnose.
+
+### The box
+
+Everything electrical except the camera lives in one box. Cables leave it to reach the three
+things that cannot be inside it.
+
+| | |
+|---|---|
+| **Inside** | Pi · relay module · PoE switch · 12V supply · 6–7.4V BEC · a powerboard for the plug-packs |
+| **Leaving it** | Ethernet to the camera · three wires to the servo · two wires to the valve · one mains lead |
+
+**What this box is not: weatherproof.** It is a carrying case. The rig goes out for an hour
+on a chosen afternoon and comes back inside, so a plastic tub with a lid is the right answer
+and a sealed enclosure with a gasket and cable glands is [beyond-v0](beyond-v0.md) work.
+Putting the powerboard inside is what turns four plug-packs into one mains lead, which is the
+difference between a box you carry and a box you rebuild every time.
+
+**What it still has to get right**, because both of these bite inside the first hour:
+
+- **Strain relief on every cable that leaves it.** A box that gets carried has its cables
+  pulled, and a wire lifted off the relay's screw terminal mid-session is either a valve that
+  stops answering or a short across the supply. Anything counts — a grommet and a knot behind
+  it, a cable tie to an internal anchor — as long as the pull lands on the box and not on a
+  terminal.
+- **Nothing spliced into mains.** Plug-packs into a powerboard, one lead out. There is water
+  and a garden on the other side of the wall; [SAFETY.md](../SAFETY.md) covers the RCD.
 
 ### Mechanics
 

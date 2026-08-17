@@ -16,12 +16,13 @@ Reading their troubleshooting pages is cheaper than reproducing their failures.
 
 **Triggers: the first night it is left outside.**
 
-A sealed box with a **gasket** and a **cable gland for every entry** — not a plastic box
-with holes drilled in it. FarmBot ships exactly this (box, lid, gasket, latches, glands).
+V0 already has a box, but it is a carrying case — a tub with a lid and holes for the cables.
+What replaces it is a **sealed** box: gasket, latches, and a **cable gland for every entry**.
+FarmBot ships exactly that (box, lid, gasket, latches, glands).
 
-The bill of materials has a Pi, a relay module, two supplies and a desktop PoE switch with
-nowhere to live. Carrying them out and back is fine for an attended hour and not fine for a
-garden.
+So this is not a missing part, it is an upgrade with a date on it. Carrying the electronics
+out and back is fine for an attended hour; it stops being fine the first night the rig stays
+outside.
 
 ## Fuse
 
