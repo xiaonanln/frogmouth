@@ -289,7 +289,9 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | **Camera** | Reolink RLC-520A PoE 5MP — 80° H FOV, 850 nm IR to 30 m | **$99.99** |
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
-| **Impact sprinkler** | metal, ground-standing — supplies the bearing, the swivel, the base and the nozzle | **~$30** |
+| **Impact sprinkler** | metal, ground-standing — bearing, swivel, base and nozzle in one | **~$30** |
+| **Swivel joint** | pressure-washer swivel — the driven joint in arrangements B and C | **~$30** |
+| Swivel adapters | M22 ↔ 3/4" BSP | ~$10 |
 | **Solenoid valve** | SparkFun ROB-10456 — 12V DC, normally closed, 3/4" BSP, 330 mA | **$22.55** |
 | **Relay module** | 5V 2-channel **opto-isolated** (Core CE05114) | **$5.70** |
 | Turret controller | Raspberry Pi — 3.3V GPIO, 5V on header pins 2 and 4 | already owned |
@@ -303,15 +305,14 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
 | **Box** | plastic tub or toolbox with a lid, plus grommets | ~$25 |
-| | | **~$290** |
+| | | **~$330** |
 
 Uncosted: whatever holds the servo alongside the sprinkler, and the camera wherever it sees
 best. Timber and screws are a legitimate answer for V0.
 
-**Fallback, ~$86:** if the sprinkler's head cannot be coupled to the servo, the parts it was
-replacing come back — lazy susan bearing $31, pressure-washer swivel $30, M22-to-BSP adapters
-$10, adjustable nozzle $15 — and so does building a base. Decide this with one in your hand,
-not from here.
+This buys the parts for all three arrangements below. If none of them can be coupled, the
+build-it-yourself stack costs another $46 — lazy susan bearing $31, adjustable nozzle $15 —
+plus making a base.
 
 The last three cost almost nothing and are each load-bearing: without the diode the valve's
 switch-off spike goes looking for the microcontroller, without the pull-up the valve opens
@@ -349,9 +350,9 @@ PTFE thread tape, the box and its grommets, and whatever timber and fasteners th
 made of. **Do not buy a
 solenoid valve here** — the irrigation aisle is 24V AC.
 
-**Only if the sprinkler cannot be coupled.** Lazy susan bearing, and a pressure-washer swivel
-with M22-to-BSP adapters — search "pressure washer swivel joint", not "rotary union", which
-returns industrial parts at ten times the price.
+**Online, no hurry.** The pressure-washer swivel and its M22-to-BSP adapters — search
+"pressure washer swivel joint", not "rotary union", which returns industrial parts at ten
+times the price. A lazy susan bearing only if all three arrangements fail.
 
 **Already owned:** the Raspberry Pi, the laptop that runs the host, and a network for them to
 find each other on.
@@ -444,35 +445,53 @@ Two things make or break it:
 - **The swivel seals, it does not carry.** The bearing takes the weight. Same rule as the
   servo shaft, for the same reason.
 
-#### Start from an impact sprinkler
+#### Buy the rotating joint rather than building it
 
-Rather than assembling that stack, buy something that already is it. A metal impact sprinkler
-is a rotating water head with the swivel **built in and concentric from the factory**, on a
-bearing sized for the job, on a heavy base that stands on the ground — which is where the
-nozzle wants to be anyway — with the longest-throwing nozzle in the garden aisle, since
-throwing far is the entire point of the type. About $30, against about $86 for the bearing,
-swivel, adapters and nozzle it replaces, and it deletes the base-building as well.
+Three arrangements do this, and they are cheap enough that the sensible move is to buy the
+parts for all of them — about $70 — and settle it in an afternoon with the things in hand.
+The document's own rule applies: the bottleneck is hardware and measurement, not analysis.
 
-The conversion is: **stop it turning itself, then drive it.**
+**A — impact sprinkler alone, ~$30.** A metal impact sprinkler already *is* a rotating water
+head: swivel built in and concentric from the factory, bearing sized for the job, heavy base
+that stands on the ground where the nozzle wants to be, and the longest-throwing nozzle in the
+garden aisle since throwing far is the point of the type. The conversion is *stop it turning
+itself, then drive it* — remove the sprung impact arm, remove the arc-reversing trip, back off
+the friction screw, and clamp a driven lever to the rotating body.
 
-1. **Disable the impact mechanism** — the sprung arm that swings into the jet and knocks the
-   head round a notch at a time. Usually a pin or a screw.
-2. **Couple the servo** — a collar clamped to the rotating body with a lever arm, and a
-   pushrod from the servo. ±40° through a linkage is undemanding.
-3. **Deal with what is left inside** — these have a friction screw for sweep speed and a trip
-   mechanism for reversing at the arc limits. Friction may fight the servo or may help it
-   hold; the trip has to go.
+**B — swivel plus a nozzle, ~$55.** A pressure-washer swivel is a sealed bearing and a rotary
+seal in one part, with nothing to defeat. But its axis has to stand vertical, so the water
+comes out facing up and needs an elbow to turn it — two more joints to leak, a cantilever
+hanging off a small bearing, and a base still to build.
 
-Five things to check with one in your hand, because none of them can be settled from here:
+**C — swivel carrying a sprinkler head, ~$70.** The combination, and probably the best of the
+three, for one reason worth stating plainly: **it moves the driven joint onto a part designed
+to turn freely, and demotes the sprinkler to something that only has to be locked. Locking is
+far easier than driving.** A grub screw or a hose clamp stops the head rotating on its own
+bearing; finding somewhere to clamp a *loaded* lever that will not slip is the hard part of A.
+The servo then drives the sprinkler body, which has far more to grip than the swivel does, and
+the heavy base and riser stay still underneath — weight on the side that does not move.
 
-- Does the head turn freely by hand once the arm is off?
-- Can the friction screw be backed off, and how far?
-- Is there anywhere to clamp a collar — a flat, a boss, wall thick enough to grip?
+```
+C:   sprinkler head (own rotation locked)
+       └ swivel, rotating half   ← servo lever clamps here or just above
+         swivel, fixed half
+           └ riser ─ heavy base (stationary)
+```
+
+Its one hard requirement: **lock the head's own rotation.** Leave it free and there are two
+rotary joints in series, the servo commands one, and the resulting angle is undetermined. The
+impact arm still comes off in every arrangement — against a locked head it just hammers away
+wasting energy and making noise.
+
+Whichever wins, four things decide it and none can be answered from here:
+
+- Is there anywhere to clamp — a flat, a boss, wall thick enough to grip?
+- Does everything turn freely by hand once the arm and trip are out?
+- Can the friction screw be backed off, and does its friction help hold or fight the servo?
 - **Does the head creep once the water is on?** Any nozzle not pointing exactly through the
-  axis leaves a reaction torque, and this is the one question that needs water to answer.
-- Does the arc-limiting trip come out cleanly?
+  axis leaves a reaction torque. This is the one that needs water to answer.
 
-Residual torque is not zero either way — line pressure loads the seal and seals have friction
+Residual torque is not zero in any arrangement — line pressure loads the seal and seals have friction
 — so *holds position against torque* stays on the definition of done. It just stops being a
 question about a garden hose and becomes a question about a bearing.
 
