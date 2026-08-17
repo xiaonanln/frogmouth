@@ -190,10 +190,32 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Servo supply | 6–7.4V, 3A+ BEC | ~$20 |
 | 12V supply | for the valve; 1A is ample at 330 mA | ~$15 |
 | Nozzle | adjustable, set to jet | ~$15 |
+| Flyback diode | 1N4004 or 1N4007, **across the solenoid** | ~$0.50 |
+| Pull-up resistor | 10 kΩ, on the relay input | ~$0.30 |
+| Bench indicator | 12V panel lamp, or an LED with a 1 kΩ series resistor | ~$2 |
 | | | **~$290** |
 
-Sydney suppliers: Core Electronics · Little Bird (Hornsby) · Jaycar (Hornsby) ·
-RC Hobbyland (Castle Hill) · Ultimate Hobbies (Parramatta)
+The last three cost almost nothing and are each load-bearing: without the diode the valve's
+switch-off spike goes looking for the microcontroller, without the pull-up the valve opens
+while the ESP32 boots, and without the indicator there is no way to prove the valve closes
+before committing water to the question.
+
+### Ordering
+
+**Core Electronics** (Newcastle, ships same day before 2PM) has the two parts that must be
+exactly right — the valve and the relay — in stock:
+
+- Solenoid valve — [ROB-10456](https://core-electronics.com.au/12v-solenoid-valve-3-4.html)
+- Relay — [CE05114](https://core-electronics.com.au/5v-2-channel-relay-module-10a.html),
+  the 2-channel board, because the 1-channel one is **not** opto-isolated
+
+The diode, resistor and indicator are generic and stocked by any electronics shop. Buy the
+diodes in a strip; they are cents each and the first one always ends up somewhere else.
+
+Other Sydney suppliers: Little Bird (Hornsby) · Jaycar (Hornsby) · RC Hobbyland (Castle
+Hill) · Ultimate Hobbies (Parramatta). Local matters here — the bottleneck is getting the
+rig standing, and a fortnight of international shipping on a critical part is a fortnight
+of not measuring anything.
 
 ### Mechanics
 
