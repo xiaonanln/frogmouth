@@ -292,6 +292,8 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | **Impact sprinkler** | metal, ground-standing — bearing, swivel, base and nozzle in one | **~$30** |
 | **Swivel joint** | pressure-washer swivel — the driven joint in arrangements B and C | **~$30** |
 | Swivel adapters | M22 ↔ 3/4" BSP | ~$10 |
+| Coupling clamp | U-bolt plus aluminium flat bar — **size it after measuring the head** | ~$5 |
+| Linkage | RC pushrod with **ball links** at both ends | ~$10 |
 | **Solenoid valve** | SparkFun ROB-10456 — 12V DC, normally closed, 3/4" BSP, 330 mA | **$22.55** |
 | **Relay module** | 5V 2-channel **opto-isolated** (Core CE05114) | **$5.70** |
 | Turret controller | Raspberry Pi — 3.3V GPIO, 5V on header pins 2 and 4 | already owned |
@@ -305,7 +307,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
 | **Box** | plastic tub or toolbox with a lid, plus grommets | ~$25 |
-| | | **~$330** |
+| | | **~$345** |
 
 Uncosted: whatever holds the servo alongside the sprinkler, and the camera wherever it sees
 best. Timber and screws are a legitimate answer for V0.
@@ -341,9 +343,12 @@ have. Order it first: longest lead time, and nothing can be aimed until it is up
 female-to-female jumper wires, and the 12V supply. Buy the diodes in a strip; they cost cents
 and the first one always ends up somewhere else.
 
-**RC Hobbyland (Castle Hill) or Ultimate Hobbies (Parramatta) — walk in.** The 6–7.4V BEC.
-This is RC-hobby stock rather than electronics stock, which is why those shops are on the
-list at all.
+**RC Hobbyland (Castle Hill) or Ultimate Hobbies (Parramatta) — walk in.** The 6–7.4V BEC, and
+the pushrod with ball links. Both are RC-hobby stock rather than electronics stock, which is why
+those shops are on the list at all.
+
+**Bunnings, second trip — after the sprinkler is in hand and measured.** The U-bolt and
+aluminium flat bar for the coupling. Sized by the head's diameter, so it cannot be bought blind.
 
 **Bunnings — walk in.** The metal impact sprinkler, 3/4" BSP hose fittings, a short flexible hose for the tail,
 PTFE thread tape, the box and its grommets, and whatever timber and fasteners the base is
@@ -490,6 +495,26 @@ Its one hard requirement: **lock the head's own rotation.** Leave it free and th
 rotary joints in series, the servo commands one, and the resulting angle is undetermined. The
 impact arm still comes off in every arrangement — against a locked head it just hammers away
 wasting energy and making noise.
+
+##### What to buy for the coupling, and what to search for
+
+Two parts, from two different kinds of shop.
+
+**The clamp on the head.** A **U-bolt** around the body with an **aluminium flat bar** across
+its nuts is about $5 at a hardware store, needs no drilling, is adjustable, and the flat bar
+*is* the lever. Search terms: `U-bolt`, `pipe saddle clamp`, `conduit saddle`, `aluminium flat
+bar`. The tidier answer is a `split shaft collar` or `clamping shaft collar` from a bearing
+supplier — less play, $10–20, and only if a size matches. `exhaust clamp` at an auto shop is
+the same idea heavier.
+
+**The rod to the servo.** Buy this from an RC hobby shop, not a hardware shop: search
+`pushrod`, `ball link`, `ball joint linkage`, `clevis`, `linkage stopper`. A wire bent into a
+hole is where slop comes from; **ball links at both ends are the cheap fix for it.** $5–10, and
+it is the same trip as the BEC.
+
+**Order the sprinkler first and measure it.** U-bolts and collars are sized by bore, and
+whether the head is 20 mm or 35 mm across is not knowable from here. This is deliberately a
+second trip.
 
 ##### The coupling is a backlash problem, not a strength problem
 
