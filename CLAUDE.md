@@ -56,9 +56,10 @@ be reached.
   decisions are on the host; firmware executes and enforces safety only.
 - Pixel → angle uses the **pinhole model**, `θ = atan(x_norm · tan(hfov/2))`. **Not**
   linear interpolation — a linear map systematically under-shoots mid-frame targets.
-- Parallax: the camera must be within ~20 cm of the turret axis **horizontally**, or close
-  targets will be missed. Height is free — only bearing is computed, so vertical separation
-  cancels when the camera sits directly above the axis. Camera high, nozzle low.
+- Camera placement is free — calibration is a measured map from image position to angle and
+  absorbs the geometry. Two consequences: off-axis, calibrate over an *area* rather than a
+  line, and the map assumes the animal is **on the ground**, so climbers read as further away
+  than they are. Co-axial mounting is the only arrangement without that assumption.
 - **Pan only, and the nozzle is mounted low.** These are one decision: a jet leaving near the
   ground stays at small-animal height for most of its flight, so bearing is the only quantity
   that has to be right. Raise the nozzle and the tilt axis comes back.

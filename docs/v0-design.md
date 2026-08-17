@@ -232,24 +232,36 @@ x_norm = (x_px − W/2) / (W/2)
 grows with wider lenses. A linear map systematically under-shoots everything between the
 centre and the edge. `sign` handles a servo that turns opposite to the image.
 
-### Parallax: horizontal offset costs, vertical offset is free
+### Camera placement: put it where it sees well
 
-Only bearing is computed here, so only **horizontal** displacement between the camera and
-the turret axis produces an error. With horizontal offset `d` and target distance `L` it is
-roughly `atan(d/L)`:
+**The camera and the turret do not have to share an axis.** Calibration is a measured map
+from image position to turret angle, and that map absorbs whatever fixed geometry it is
+handed. Mount the camera where the view is good — high, looking down, away from the
+foliage — and let the fit deal with it.
+
+Two things follow, and both are about the *fit* rather than the mounting.
+
+**Calibrate over an area, not a line.** With the camera on the turret's axis, bearing depends
+on `pixel_x` alone and three or four points across the frame are enough. Off-axis, the right
+angle depends on how far away the target is as well, which the image encodes as `pixel_y` —
+so the calibration points have to spread across the ground in **both** directions, not along
+one line, and there need to be more of them. Same procedure as below, more targets.
+
+**The map assumes the animal is standing on the ground.** That is how `pixel_y` becomes
+distance. A possum on a fence, a bird on a branch, a cat on a wall — anything above the
+ground plane reads as further away than it is, and the shot goes wide. Co-axial mounting is
+the one arrangement immune to this, since bearing then contains no distance term at all.
+
+For reference, if the camera does end up off-axis by `d` with the target at `L`, an
+*uncorrected* map is wrong by about `atan(d/L)`:
 
 | Horizontal offset | 1 m | 3 m | 5 m |
 |---|---|---|---|
-| 20 cm | 11° ⚠️ | 3.8° | 2.3° |
-| 50 cm | 27° ❌ | 9.5° ⚠️ | 5.7° |
+| 20 cm | 11° | 3.8° | 2.3° |
+| 50 cm | 27° | 9.5° | 5.7° |
 
-**Height, on the other hand, is free.** A camera sitting directly above the axis of rotation
-sees every target on exactly the bearing the turret would — the vertical separation cancels,
-because bearing is a horizontal quantity and no elevation is ever computed from the image.
-
-So put the camera **high** — a downward view has less occlusion and separates animals that
-would overlap at ground level — and the nozzle **low**, and run a plumb line between them.
-Get them on the same vertical axis and the offset is zero at every distance.
+That is the size of what calibration is being asked to absorb — worst close in, which is also
+where the animal is when it matters.
 
 ### Calibration is measured, not configured
 
