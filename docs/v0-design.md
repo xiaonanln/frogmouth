@@ -571,6 +571,79 @@ Two cheap wins that cost no parts:
 And check the actual servo's backlash figure rather than assuming 0.5° — it is published for
 some 35 kg·cm units and not for others.
 
+##### Coaxial drive: right idea, wrong fitting
+
+There is a fourth arrangement, and the reasoning that dismissed it was wrong. *Water occupies
+the rotation axis* is only true of a **straight-through** joint. Put an **elbow** on the swivel
+and the water turns outward before it reaches the top — so the axis above the bend is empty, and
+a servo on a bracket over the top can drive the joint **directly, on-axis, 1:1, with no linkage
+at all.** No ball links, no crank radius, no four-bar geometry.
+
+It is genuinely attractive, and with an off-the-shelf angled tap connector it is still a trap.
+The freed axis lands on the **outside of a curved brass casting** — no flat, no boss, nothing
+manufactured to attach to. And the rule against drilling into a pressurised part applies exactly
+there. Every quick fix is bad: a bonded disc has almost no bond area and loads it in peel;
+brazing cooks the O-ring; filing a flat removes wall. A split saddle bridging over the elbow does
+respect the pressure boundary, but then it is a custom fixture whose shaft has to be centred over
+an axis nothing externally defines — and being assembled 1–2 mm off-axis is the likely failure,
+long before anything bursts.
+
+The deeper point is that **fewer parts is not the same as easier**:
+
+> The parallelogram tolerates considerable axis-placement error without side-loading the swivel.
+> Direct coaxial mounting has fewer parts, but each part must be located substantially more
+> accurately. It does not remove error; it trades one set for another.
+
+**The variant that does work is a tee instead of an elbow.**
+
+```
+fixed riser → straight live swivel → short rotating nipple → brass TEE
+                                                              ├─ side branch → nozzle
+                                                              └─ top port → threaded plug
+                                                                             └─ shaft → coupling → servo
+```
+
+The tee's top port is a **manufactured, pressure-rated thread**, and its plug is a separate
+replaceable part rather than a casting wall. Clamp a bored hub around a brass hex plug, or use a
+reducing bush with a male shaft adapter, or machine the plug's *external* head with the plug out
+of the system and refit it with sealant. Cross-bolt only through solid material above the sealing
+thread. Never into the wet cavity.
+
+Two conditions gate it:
+
+- **The swivel must be a live swivel.** The whole tee downstream of it has to rotate while
+  pressurised without loosening a threaded joint. A tap adaptor whose "swivel" only lets its nut
+  turn during installation will not do this.
+- **The breakaway torque has to be low enough** — measure it, below. Coaxial drive is exposed
+  directly to seal stiction with no reduction to soften it.
+
+If both hold, use a **zero-backlash Oldham** coupling (not a rubber spider — a soft spider winds
+up torsionally and stores energy until it breaks away, which *is* stick-slip), on a vertically
+adjustable bracket. Target parallel offset under 0.25–0.5 mm and angular error under 0.5°: the
+coupling absorbs the residue after alignment, it is not a substitute for aligning.
+
+##### Measure the breakaway torque before designing around the swivel
+
+Cheap, decisive, and it needs no build. Pressurise the fitting exactly as intended, clamp a
+temporary **100 mm lever** to the rotating part, and pull tangentially with a **fishing or
+luggage scale**. At that radius, `T = F × 0.1`, so newtons read directly as tenths of a N·m:
+
+| Pull | Torque |
+|---|---|
+| 1 N | 0.10 N·m |
+| 3 N | 0.30 N·m |
+| 5 N | 0.50 N·m |
+
+The servo's 35 kgf·cm is about **3.4 N·m**, so raw torque is never the question. What matters is
+staying well under **0.2–0.3 N·m** breakaway, leaving margin for control, nozzle reaction and
+bracket flex. Record five things: force to start moving, force while moving, whether breakaway
+differs by direction, whether it returns to the same marked angle from both approaches, and
+whether friction climbs at 500 kPa.
+
+**The gap between starting and running force matters more than either number.** Starts at 7 N and
+runs at 2 N means stick-slip and direct drive is out. Starts at 2 N and runs at 1.5 N means
+coaxial drive is plausible.
+
 ##### What the drive can defer, and what it cannot
 
 Legitimately postponed to the six-week experiment: corrosion, UV, weather sealing, cable creep,
