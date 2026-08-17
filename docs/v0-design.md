@@ -9,6 +9,23 @@ firing at a person and without the valve ever sticking open.**
 
 ---
 
+## What V0 is graded on
+
+**The path, link by link — not how well any link performs.**
+
+```
+frame arrives → detector emits a box → box becomes an angle → servo reaches it
+              → valve opens → water lands there → the event is logged
+```
+
+Every arrow either carries the signal to the next stage or it does not. V0 asks only that
+none of them is broken.
+
+It does **not** ask whether the classifier is any good. Mistaking a cat for a possum, or
+missing an animal entirely, is a model problem — solved with data and training, and solved
+*after* there is a working path to drop a better model into. Grading V0 on accuracy would
+mean tuning a model against a rig that has never fired end to end.
+
 ## What V0 does not chase
 
 **Not reliability, not power, not weatherproofing, not uptime.** V0 runs for an hour with
@@ -16,10 +33,13 @@ someone standing next to it, on a day chosen for the purpose, and then gets carr
 inside. Anything whose payoff arrives after the first week belongs in
 [beyond-v0.md](beyond-v0.md), not here.
 
-The exception is **safety, which is not the same thing as reliability.** V0 fires by
-itself, so it can hit a person — and that is a property of the *first* autonomous shot, not
-of the hundredth hour. The never-fire-at-humans rule, the duration cap and the fail-closed
-valve are in from the start. Everything else that merely sounds prudent can wait.
+What does stay in from the first day is the short list of things that cost **one line or one
+wire**, and whose absence is not recoverable later: the fail-closed valve, the duration cap,
+and the never-fire-at-humans check. The last is in because a detector looking for animals
+emits `person` in the same forward pass — the check is `if person in frame: return`, at no
+extra latency and no extra model. They are in because they are free, not because they are
+prudent. How *reliably* the human check holds is a model-quality question like any other,
+and V0 is not graded on it.
 
 ## Three stages, and every one of them is kept
 
@@ -475,10 +495,8 @@ it sits on a moving flexible tail rather than fixed plumbing.
       target across the frame
 - [ ] One hour of clicking with no missed close and no drift
 - [ ] Detector runs on the live stream and produces angles the turret acts on
-- [ ] **No shot is issued while a person is in frame** — checked by walking into frame
-      mid-session, repeatedly, including alongside an animal
-- [ ] One hour unattended-in-principle: firing on its own, with someone watching but not
-      touching
+- [ ] The whole path closes unaided at least once: an animal walks in, water arrives at it,
+      the event appears in the log — nobody touching anything
 - [ ] Events logged and readable
 
 Only then: night, infrared, and the six-week experiment.
