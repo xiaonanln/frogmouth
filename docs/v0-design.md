@@ -522,18 +522,70 @@ Whatever grips the rotating part, the torque it carries is small — seal fricti
 reaction the nozzle leaves, with gravity contributing nothing about a vertical axis. So the
 clamp does not need to be fierce.
 
-What it must not have is **play**. A loose grip does not fail by slipping catastrophically; it
-fails by turning a commanded angle into an approximate one. On a 25 mm body with a 50 mm lever,
-1 mm of slop is about 1° — the same order as the whole aiming budget. It would present as
-calibration drifting, which is expensive to chase.
+What it must not have is **play**, because play turns a commanded angle into an approximate one.
+The scale is unforgiving: at a 30 mm crank radius one degree is 0.52 mm of travel, at 40 mm it is
+0.70 mm. Two mediocre joints and a flexible bracket spend the entire 1–2° budget on their own.
+Two consequences:
 
-Hence: **prefer a shape that cannot slip over a grip that must not slip.** If the head offers a
-flat, a hex or a boss, drive that. Form closure beats friction closure, needs less clamping
-force, and does not loosen as things get wet.
+- **Use the largest crank radius that fits.** 35–40 mm rather than 20 mm. It does nothing for
+  angular error but it divides every *linear* error — joint clearance, bracket flex, clamp creep.
+- **Prefer a shape that cannot slip over a grip that must not slip.** A flat, a hex or a boss to
+  drive against beats friction on a smooth cylinder. Where only a cylinder is available, use a
+  two-piece clamp with a thin rubber or fibre friction liner and an anti-rotation tab bearing
+  against an existing feature. **Never drill into a pressurised part of the head.**
 
-This also cuts the other way. If gripping the head turns out to be easy, the main objection to
-arrangement A evaporates and it saves $40. Which is the point: these are things to look at, not
-to reason about.
+##### Which drive, and the one number that decides it
+
+Three ways to get rotation from an offset servo axis to the head, and they rank differently for
+V0 than they do on merit:
+
+| | Kinematics | For a rig built this morning |
+|---|---|---|
+| **Parallelogram pushrod** | exact 1:1, but passes servo lash through undivided | **build this** |
+| Timing belt, e.g. 20T→30T | constant ratio *and* reduction — strictly better on paper | the upgrade path |
+| Pull–pull cable | also constant ratio; drum can surround the water axis | skip |
+
+The parallelogram: **equal crank lengths, and a ball-to-ball pushrod equal to the measured
+axis-to-axis spacing.** The four links then form a parallelogram, the cranks stay parallel, and
+the angle transfers exactly — no lookup table, no varying ratio, and the change-point that would
+jam it sits out near ±90°, far outside ±40°. Unequal cranks give a ratio that varies across the
+sweep and are not worth choosing.
+
+But 1:1 has a real cost, and it is the term this document previously ignored: **the servo's own
+gearbox lash, around 0.5° on this class of servo, arrives at the head undivided.** A 1.5:1
+reduction would cut it to 0.33°. So a belt is genuinely better — by 0.17°.
+
+That number is the decision. A split pulley clamped onto a brass casting by hand, slightly
+eccentric or slightly loose, loses far more than 0.17°. The belt only pays if its driven pulley
+is truly concentric, rigidly held, and aligned with the servo pulley without side-loading the
+head — none of which a same-morning build can promise. **Build the parallelogram; keep the belt
+as the upgrade once the geometry is known and something can be machined.**
+
+Two cheap wins that cost no parts:
+
+- **Always approach a target from the same direction** — command a couple of degrees past it and
+  come back. Backlash is hysteresis, so a consistent approach direction removes most of its
+  effect for free. Worth doing whichever drive is fitted.
+- **Keep the servo off its mechanical endpoints**, roughly 30–150° of its range.
+
+And check the actual servo's backlash figure rather than assuming 0.5° — it is published for
+some 35 kg·cm units and not for others.
+
+##### What the drive can defer, and what it cannot
+
+Legitimately postponed to the six-week experiment: corrosion, UV, weather sealing, cable creep,
+belt tooth wear, bearing fatigue, lubricant washout, thermal cycling, fasteners loosening over
+many cycles.
+
+**Not deferrable, because they bite in the first hour:** head play measured with water both off
+and on · nozzle reaction when the valve opens · the clamp neither entering the water path nor
+obstructing rotation · not deforming the rotary joint · side-load and the stiction it causes ·
+supply voltage sag while the servo moves · physical or software stops that keep the mechanism
+away from a toggle position · repeatability checked from *both* approach directions.
+
+*(The drive ranking, the 0.17° figure and the defer split came out of a design discussion with
+GPT-5; it conceded the parallelogram point and supplied the servo-lash term this document had
+missed.)*
 
 Whichever wins, four things decide it and none can be answered from here:
 
