@@ -531,8 +531,15 @@ Two consequences:
   angular error but it divides every *linear* error — joint clearance, bracket flex, clamp creep.
 - **Prefer a shape that cannot slip over a grip that must not slip.** A flat, a hex or a boss to
   drive against beats friction on a smooth cylinder. Where only a cylinder is available, use a
-  two-piece clamp with a thin rubber or fibre friction liner and an anti-rotation tab bearing
-  against an existing feature. **Never drill into a pressurised part of the head.**
+  two-piece clamp with a thin rubber or fibre liner, and give the clamp screw something to sit in:
+  **a shallow dimple drilled part-way into the wall, not a hole through it.** That is form closure
+  without ever breaching the water passage, and it beats tightening harder.
+
+  Drilling *through* is a leak, not a hazard — brass at 500 kPa weeps, it does not burst, and a
+  weep during an attended hour is visible and fixable. Treat "do not breach the wall" as a rule for
+  the six-week experiment, not a constraint on V0. What *does* apply now is mechanical: a 2 mm brass
+  wall takes two or three threads, which will strip under a driven load. Let a dimple stop rotation
+  and let the clamp band carry the torque.
 
 ##### Which drive, and the one number that decides it
 
@@ -607,7 +614,12 @@ The tee's top port is a **manufactured, pressure-rated thread**, and its plug is
 replaceable part rather than a casting wall. Clamp a bored hub around a brass hex plug, or use a
 reducing bush with a male shaft adapter, or machine the plug's *external* head with the plug out
 of the system and refit it with sealant. Cross-bolt only through solid material above the sealing
-thread. Never into the wet cavity.
+thread. Not into the wet cavity — though again, breaching it costs a weep rather than a
+failure, so this is tidiness for the long run rather than a V0 gate.
+
+**Relaxing that rule does not rescue the curved-elbow version.** Its problem was never attachment
+strength, it was concentricity: a hole drilled freehand on a curved crown is no more *on the axis*
+than a bonded disc is. Two millimetres off-axis is two millimetres off-axis however it got there.
 
 Two conditions gate it:
 
