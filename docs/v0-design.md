@@ -280,19 +280,34 @@ change shape.
 
 ---
 
-## Testable without hardware
+## Verified on the real rig, dry
 
-Everything above except the servo and the valve can be exercised against a mock device
-that speaks the same protocol and simulates servo travel time. Geometry and safety logic
-are pure functions and pure state machines — both deserve tests, and both are where a
-silent error is most expensive:
+**No mock device.** The bottleneck on this project is hardware and measurement, and a
+simulated serial peer proves only that the host agrees with a fiction someone wrote. It
+would pass happily while the servo stalls, the relay chatters, or the board browns out.
 
-- Calibration wrong → *"it aims left but sprays right"*
-- Safety wrong → *the valve stays open*
+What replaces it is a **dry bench**: the real ESP32, the real servo, and an LED across the
+relay output where the solenoid will go. Everything behaves as it will in the garden
+except that nothing gets wet — so the two most expensive silent errors are visible before
+a hose is connected:
+
+| Error | How it shows on the dry bench |
+|---|---|
+| Calibration wrong — *"it aims left but sprays right"* | servo turns to the wrong angle for a known click |
+| Safety wrong — *the valve stays open* | LED stays lit past the duration cap, after `STOP`, or when the host is killed mid-spray |
+
+**Connect water only after the LED has behaved for a full session**, including a host kill
+mid-spray and a power cut. An LED that stays on is a bug; a valve that stays open is a
+flooded garden and a lesson about normally-closed valves you did not need to pay for.
+
+Geometry and the calibration solve stay ordinary unit-tested functions — pixel in, angle
+out, no device of any kind involved. That is arithmetic rather than simulation, and it
+costs nothing to check.
 
 ## Definition of done
 
 - [ ] `PING` round-trips over real serial
+- [ ] Dry bench passes a full session on the LED before water is connected
 - [ ] Servo reaches both mechanical limits and holds against hose torque
 - [ ] Valve opens and closes; **never observed stuck open**
 - [ ] Watchdog closes the valve when the host is killed mid-spray
