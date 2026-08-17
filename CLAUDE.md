@@ -56,8 +56,12 @@ be reached.
   decisions are on the host; firmware executes and enforces safety only.
 - Pixel → angle uses the **pinhole model**, `θ = atan(x_norm · tan(hfov/2))`. **Not**
   linear interpolation — a linear map systematically under-shoots mid-frame targets.
-- Parallax: the camera must be mounted within ~20 cm of the turret axis, or close
-  targets will be missed.
+- Parallax: the camera must be within ~20 cm of the turret axis **horizontally**, or close
+  targets will be missed. Height is free — only bearing is computed, so vertical separation
+  cancels when the camera sits directly above the axis. Camera high, nozzle low.
+- **Pan only, and the nozzle is mounted low.** These are one decision: a jet leaving near the
+  ground stays at small-animal height for most of its flight, so bearing is the only quantity
+  that has to be right. Raise the nozzle and the tilt axis comes back.
 - The detector must work on **bursts of frames and cold starts**, not a continuous
   stream with long-lived tracking state. A future battery version wakes from sleep with
   no history; if the logic depends on 30 seconds of tracking, it will need a rewrite.

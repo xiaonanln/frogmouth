@@ -85,6 +85,9 @@ firing** · event log · safety (limits, cooldown, watchdog, fail-closed)
 
 **Out:** tilt · night operation and IR · wireless, battery, solar
 
+**Tilt is out because the nozzle is low**, not because aiming in elevation would be hard —
+see the mechanics section. The two decisions are one decision and must not be separated.
+
 Night is out of V0 even though the most interesting targets are nocturnal. That is a
 deliberate ordering: daylight targets — brush turkeys, cats, birds — are enough to prove
 the loop, and infrared brings its own perception problem that deserves its own attempt.
@@ -225,17 +228,24 @@ x_norm = (x_px − W/2) / (W/2)
 grows with wider lenses. A linear map systematically under-shoots everything between the
 centre and the edge. `sign` handles a servo that turns opposite to the image.
 
-### Parallax: mount the camera against the turret
+### Parallax: horizontal offset costs, vertical offset is free
 
-Calibration assumes camera and turret share an axis. With offset `d` and target distance
-`L`, the pointing error is roughly `atan(d/L)`:
+Only bearing is computed here, so only **horizontal** displacement between the camera and
+the turret axis produces an error. With horizontal offset `d` and target distance `L` it is
+roughly `atan(d/L)`:
 
-| Offset | 1 m | 3 m | 5 m |
+| Horizontal offset | 1 m | 3 m | 5 m |
 |---|---|---|---|
 | 20 cm | 11° ⚠️ | 3.8° | 2.3° |
 | 50 cm | 27° ❌ | 9.5° ⚠️ | 5.7° |
 
-**Keep it under 20 cm, ideally directly above the axis of rotation.**
+**Height, on the other hand, is free.** A camera sitting directly above the axis of rotation
+sees every target on exactly the bearing the turret would — the vertical separation cancels,
+because bearing is a horizontal quantity and no elevation is ever computed from the image.
+
+So put the camera **high** — a downward view has less occlusion and separates animals that
+would overlap at ground level — and the nozzle **low**, and run a plumb line between them.
+Get them on the same vertical axis and the offset is zero at every distance.
 
 ### Calibration is measured, not configured
 
@@ -402,6 +412,24 @@ The lazy susan bearing takes the load; the servo drives through a horn or linkag
 Water path: fixed hose → **short flexible hose** → rotating head. A stiff garden hose
 will twist the servo back. A proper water rotary union costs $50–200 — skip it for V0; a
 flexible tail is fine over ±60°, comfortably more than the ±40° the camera's FOV asks for.
+
+#### Mount the nozzle low. This is what removes the tilt axis.
+
+A jet leaving near ground level at a few degrees of rise stays inside the height band a
+small animal occupies — roughly 0 to 40 cm — for most of its flight. Anything standing along
+that bearing gets hit somewhere, at a wide range of distances, without the range ever being
+aimed at. **Bearing is the only quantity that has to be right.**
+
+Mount the same nozzle at chest height and that stops being true: a downward stream crosses
+animal height at exactly one distance, and hitting anything then requires elevation as well.
+Tilt would be back, and with it a second servo, a second calibration and a second axis of
+error.
+
+So elevation is **set once and bolted**, not controlled — a few degrees up, adjusted during
+calibration until the useful band covers the ground you care about. The band has ends: very
+close in, the stream has barely risen; far out, it has already landed. Neither end needs
+aiming, both need knowing, and both come out of the flow measurement rather than a
+calculation.
 
 ### Four mistakes that cost a rebuild
 
