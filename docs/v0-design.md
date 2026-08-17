@@ -261,7 +261,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Part | Model | Price (AUD) |
 |---|---|---|
 | **Camera** | Reolink RLC-520A PoE 5MP — 80° H FOV, 850 nm IR to 30 m | **$99.99** |
-| PoE injector | any | ~$25 |
+| Camera supply | 12V 1A adapter — **not shared with the valve** | ~$15 |
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
 | **Bearing** | heavy-duty aluminium lazy susan | **$31** |
@@ -278,7 +278,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Hose fittings | 3/4" BSP, tap to valve | ~$15 |
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
-| | | **~$310** |
+| | | **~$300** |
 
 Not costed, because it depends on what you build it on: the **base and bracket** that hold
 the bearing, the servo and the camera together. The mechanics section below says what has to
@@ -303,9 +303,9 @@ substitute:
   The 2-channel board specifically, because the cheaper 1-channel one is **not** opto-isolated
 - Servo and horn, if you are consolidating orders
 
-**Camera — Reolink direct or any reseller.** RLC-520A plus a PoE injector, unless there is
-already a PoE switch. This one is worth ordering first: it has the longest lead time and
-nothing can be aimed until it is up.
+**Camera — Reolink direct or any reseller.** RLC-520A. Order it first: longest lead time, and
+nothing can be aimed until it is up. A PoE injector is *not* needed for the topology below —
+see Network.
 
 **Jaycar (Hornsby) or Little Bird — walk in.** Diode, 10 kΩ resistor, 12V indicator lamp,
 female-to-female jumper wires, and the 12V supply. Buy the diodes in a strip; they cost cents
@@ -328,6 +328,36 @@ find each other on.
 Local matters more than price for everything above the bearing. The bottleneck is getting the
 rig standing, and a fortnight of international shipping on a critical part is a fortnight of
 not measuring anything.
+
+### Network
+
+The camera is **Ethernet-only — no WiFi** — so it has to reach a physical port. The rig
+assumes a mesh node outdoors, which makes that port a short cable away:
+
+```
+indoor router ══ mesh backhaul ══ outdoor node ── cable ── camera
+                                        └── WiFi ── Pi
+laptop (host) ── indoor network
+```
+
+Two things follow.
+
+**No PoE injector.** PoE earns its cost when one long cable must carry power and data from
+indoors. With the network and a power outlet already outside, the run is a metre and the
+camera's own 12V input is simpler and $10 cheaper. Keep that supply **separate from the
+valve's** — the solenoid puts switching noise on its rail, and a camera that glitches only
+while spraying is a miserable thing to diagnose.
+
+**Pull the substream, not the 5MP main stream.** Detection does not need full resolution, and
+the video crosses a wireless backhaul to reach the host. The substream is roughly a megabit;
+the main stream is not. Fetch the main stream only when looking at something closely.
+
+A mesh link drops occasionally by nature. That is not a special case here — silence closing
+the valve is exactly what the watchdog is for, and reconnecting is an ordinary event.
+
+If the outdoor node turns out to have no Ethernet port at all — eero Beacons and Extenders
+have none — the Pi has both a port and WiFi and can carry the camera itself. Check the back
+of the unit before ordering.
 
 ### Mechanics
 
