@@ -431,6 +431,30 @@ close in, the stream has barely risen; far out, it has already landed. Neither e
 aiming, both need knowing, and both come out of the flow measurement rather than a
 calculation.
 
+##### Varying the nozzle opening is not a range control
+
+It looks like one — open wide for near, narrow for far — and it fails three ways.
+
+**The physics runs backwards.** Exit velocity comes from pressure, not from aperture; the
+aperture sets flow. A wide opening flows more, drops more pressure in the hose, and arrives
+at the tip *slower*. Narrowing it throws water **further**, which is why squeezing a hose end
+makes it squirt across the yard. And the relationship is not just inverted but cliffed: past
+some point the stream breaks into spray and the range collapses.
+
+**It costs an actuator on the rotating head** — a servo to turn the nozzle collar, plus its
+own calibration. That is precisely the cost that mounting the nozzle low was chosen to avoid,
+reintroduced on the one part already fighting hose torque.
+
+**It answers a question the geometry already answered.** A low jet covers a long band of
+distances *simultaneously*. Sweeping near-to-far is only worth anything if the instantaneous
+band is shorter than the ground being defended, and whether it is comes out of the flow
+measurement, not out of a calculation.
+
+If the band does measure short, the cheap fixes come first and none of them is a mechanism:
+adjust the nozzle it already has (including trying a vertical fan, trading impact for
+coverage), adjust the bolted elevation, shorten or widen the supply hose to lose less
+pressure, or move the rig.
+
 ### Four mistakes that cost a rebuild
 
 **1. The valve must be 12V DC, not 24V AC.** Most irrigation valves sold in hardware
