@@ -103,10 +103,22 @@ The camera is fixed, so **its field of view is the entire sensed area**. Therefo
 
 The RLC-520A is 80° horizontal, so the sweep is fixed: **±40° about the centre line.**
 
-That number is for the *mechanics* — bracket travel, hose slack, where the servo's centre
-has to sit. It does not go into the software. 80° is a datasheet figure, and the next
-section is about why those are not trusted: the `hfov` the controller uses comes out of
-calibration, and the servo's software limits are derived from that measured value.
+80° is a datasheet figure, and the next section is about why those are not trusted. Size
+the *mechanics* with it — bracket travel, hose slack, where the servo's centre has to sit
+— and nothing else. Two separate limits come out of the build, and conflating them is a
+safety bug:
+
+| Limit | Lives in | Comes from |
+|---|---|---|
+| **Mechanical** | firmware | the physical stops — measured bracket travel and hose slack |
+| **Reachable image** | host | `centre ± hfov/2`, from calibration |
+
+The firmware clamp is a property of the rig, not of the camera, so calibration must never
+feed it. A crooked mount can calibrate to `centre = 10°, hfov = 80°` — reachable −30°..50°,
+which on one side is past where the bracket lets the servo go. Deriving the firmware limit
+from that would let a host aiming at something genuinely in frame drive the servo into its
+own stop. The firmware clamps to the stops, the host declines to aim outside the frame,
+and neither number is computed from the other.
 
 Pixel offset is proportional to `tan θ`, so:
 
