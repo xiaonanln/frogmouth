@@ -304,7 +304,9 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
 | **Box** | plastic tub or toolbox with a lid, plus grommets | ~$25 |
-| | | **~$310** |
+| **Swivel joint** | pressure-washer swivel, **mounted on the rotation axis** | ~$30 |
+| Swivel adapters | M22 ↔ 3/4" BSP | ~$10 |
+| | | **~$345** |
 
 Not costed, because it depends on what you build it on: the **base and bracket** that hold
 the bearing, the servo and the camera together. The mechanics section below says what has to
@@ -346,8 +348,9 @@ PTFE thread tape, the box and its grommets, and whatever timber and fasteners th
 made of. **Do not buy a
 solenoid valve here** — the irrigation aisle is 24V AC.
 
-**Online, no hurry.** The lazy susan bearing. Nothing else waits on it, so it is the one item
-where a slow shipment costs nothing.
+**Online, no hurry.** The lazy susan bearing, and the pressure-washer swivel with its M22-to-BSP
+adapters — search "pressure washer swivel joint", not "rotary union", which returns industrial
+parts at ten times the price.
 
 **Already owned:** the Raspberry Pi, the laptop that runs the host, and a network for them to
 find each other on.
@@ -417,17 +420,39 @@ difference between a box you carry and a box you rebuild every time.
 
 ### Mechanics
 
+Three paths, each doing exactly one job, and none of them doing another's:
+
 ```
-sprinkler → rotating top → turntable bearing → 25T horn → 35 kg servo → fixed base
-                              ↑ carries load                ↑ supplies torque only
+load   nozzle ─ rotating top ─ turntable bearing ─ fixed base
+drive                          25T horn ─ 35 kg servo ─ fixed base
+water  nozzle ─ swivel ON THE ROTATION AXIS ─ fixed supply hose
 ```
 
 **Do not let the servo output shaft carry the sprinkler's weight or the hose's pull.**
 The lazy susan bearing takes the load; the servo drives through a horn or linkage.
 
-Water path: fixed hose → **short flexible hose** → rotating head. A stiff garden hose
-will twist the servo back. A proper water rotary union costs $50–200 — skip it for V0; a
-flexible tail is fine over ±60°, comfortably more than the ±40° the camera's FOV asks for.
+**The hose does not rotate.** A swivel joint on the axis lets the head turn while the supply
+hose stays still, which deletes the headline mechanical risk of this project rather than
+asking the servo to overcome it. A garden hose is stiff, and a stiff hose twisting the turret
+back is the difference between water landing where it was aimed and water landing where the
+hose decided.
+
+Two things make or break it:
+
+- **The swivel goes on the axis of rotation.** Off-axis it is just a lever arm in a new place.
+  Water comes up the axis, through the swivel, into the rotating head.
+- **The swivel seals, it does not carry.** The bearing still takes the weight. Same rule as
+  the servo shaft, for the same reason.
+
+Pressure-washer swivel joints are the cheap way to get this: sealed bearings, free rotation,
+rated for thousands of PSI against the ~70 PSI a garden tap produces. Around $20–40, plus
+adapters, since they come in M22 rather than BSP. The document previously said to skip this
+and run a flexible tail instead, on the basis that a proper rotary union costs $50–200; that
+is industrial pricing and not what this needs.
+
+Residual torque is not zero — line pressure loads the seal and the seal has friction — so
+*holds position against torque* stays on the definition of done. It just stops being a
+question about a garden hose and becomes a question about a bearing.
 
 #### Mount the nozzle low. This is what removes the tilt axis.
 
@@ -658,7 +683,8 @@ it sits on a moving flexible tail rather than fixed plumbing.
 - [ ] `PING` round-trips over the real link
 - [ ] `AIM` turns the servo and `SPRAY` opens the valve, typed by hand, one at a time
 - [ ] Dry bench passes a full session on the indicator before water is connected
-- [ ] Servo reaches both mechanical limits and holds against hose torque
+- [ ] Servo reaches both mechanical limits and holds against the swivel's seal friction
+- [ ] Supply hose does not move when the turret does
 - [ ] Valve opens and closes; **never observed stuck open**
 - [ ] Watchdog closes the valve when the host is killed mid-spray
 - [ ] Calibration solved from measured points; water lands within a jet-width of a clicked
