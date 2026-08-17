@@ -261,7 +261,6 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Part | Model | Price (AUD) |
 |---|---|---|
 | **Camera** | Reolink RLC-520A PoE 5MP — 80° H FOV, 850 nm IR to 30 m | **$99.99** |
-| Camera supply | 12V 1A adapter — **not shared with the valve** | ~$15 |
 | **Servo** | DFRobot 35 kg·cm waterproof 180° IP54 | **$36.55** |
 | Servo horn | aluminium 25T round disc | $3.47 |
 | **Bearing** | heavy-duty aluminium lazy susan | **$31** |
@@ -278,7 +277,7 @@ Store the result in a config file. Recalibrate whenever the rig is physically mo
 | Hose fittings | 3/4" BSP, tap to valve | ~$15 |
 | Flexible tail | short reinforced hose, valve to rotating head | ~$10 |
 | Thread tape | PTFE, for every BSP joint | ~$2 |
-| | | **~$300** |
+| | | **~$285** |
 
 Not costed, because it depends on what you build it on: the **base and bracket** that hold
 the bearing, the servo and the camera together. The mechanics section below says what has to
@@ -303,9 +302,9 @@ substitute:
   The 2-channel board specifically, because the cheaper 1-channel one is **not** opto-isolated
 - Servo and horn, if you are consolidating orders
 
-**Camera — Reolink direct or any reseller.** RLC-520A. Order it first: longest lead time, and
-nothing can be aimed until it is up. A PoE injector is *not* needed for the topology below —
-see Network.
+**Camera — Reolink direct or any reseller.** RLC-520A, camera only. It ships with **no power
+supply of any kind** — no adapter, no injector — because it assumes a PoE switch, which we
+have. Order it first: longest lead time, and nothing can be aimed until it is up.
 
 **Jaycar (Hornsby) or Little Bird — walk in.** Diode, 10 kΩ resistor, 12V indicator lamp,
 female-to-female jumper wires, and the 12V supply. Buy the diodes in a strip; they cost cents
@@ -331,33 +330,36 @@ not measuring anything.
 
 ### Network
 
-The camera is **Ethernet-only — no WiFi** — so it has to reach a physical port. The rig
-assumes a mesh node outdoors, which makes that port a short cable away:
+The camera is **Ethernet-only — no WiFi** — and ships with no power supply at all, so it
+needs a port that also feeds it. A PoE switch does both:
 
 ```
-indoor router ══ mesh backhaul ══ outdoor node ── cable ── camera
-                                        └── WiFi ── Pi
+indoor router ══ mesh backhaul ══ outdoor mesh node
+                                        │
+                                  PoE+ switch ─┬── camera   (power + data, one cable)
+                                               └── Pi       (wired)
 laptop (host) ── indoor network
 ```
 
-Two things follow.
+**PoE+ is 802.3at and covers the camera's 802.3af**, so any PoE+ switch works and no injector
+or 12V adapter is needed. One cable to the camera instead of two.
 
-**No PoE injector.** PoE earns its cost when one long cable must carry power and data from
-indoors. With the network and a power outlet already outside, the run is a metre and the
-camera's own 12V input is simpler and $10 cheaper. Keep that supply **separate from the
-valve's** — the solenoid puts switching noise on its rail, and a camera that glitches only
-while spraying is a miserable thing to diagnose.
+**The Pi goes on the wire too**, since the ports are there. The control link then stops
+competing with video for the same radio, which costs nothing to arrange and is one less thing
+that can look like a bug.
 
 **Pull the substream, not the 5MP main stream.** Detection does not need full resolution, and
-the video crosses a wireless backhaul to reach the host. The substream is roughly a megabit;
-the main stream is not. Fetch the main stream only when looking at something closely.
+the video still crosses the wireless backhaul to reach the host. The substream is roughly a
+megabit; the main stream is not. Fetch the main stream only when looking closely at something.
 
 A mesh link drops occasionally by nature. That is not a special case here — silence closing
-the valve is exactly what the watchdog is for, and reconnecting is an ordinary event.
+the valve is what the watchdog is for, and reconnecting is an ordinary event.
 
-If the outdoor node turns out to have no Ethernet port at all — eero Beacons and Extenders
-have none — the Pi has both a port and WiFi and can carry the camera itself. Check the back
-of the unit before ordering.
+A desktop switch is not weatherproof. For V0 it gets carried out, plugged in, and carried
+back, which is the whole V0 posture; finding it a permanent home is
+[beyond-v0](beyond-v0.md) work. If no PoE switch were available, the camera's own 12V input
+is the fallback — kept off the valve's rail, since the solenoid puts switching noise there
+and a camera that glitches only while spraying is a miserable thing to diagnose.
 
 ### Mechanics
 

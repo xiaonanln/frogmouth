@@ -19,7 +19,9 @@ Reading their troubleshooting pages is cheaper than reproducing their failures.
 A sealed box with a **gasket** and a **cable gland for every entry** — not a plastic box
 with holes drilled in it. FarmBot ships exactly this (box, lid, gasket, latches, glands).
 
-The bill of materials has a Pi, a relay module and two supplies with nowhere to live. That is fine on a bench and not fine in a garden.
+The bill of materials has a Pi, a relay module, two supplies and a desktop PoE switch with
+nowhere to live. Carrying them out and back is fine for an attended hour and not fine for a
+garden.
 
 ## Fuse
 
